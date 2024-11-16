@@ -1,4 +1,4 @@
-package es.codevert_api;
+package com.github.ironbit;
 
 public class FileConverter {
     public FileConverter(){
