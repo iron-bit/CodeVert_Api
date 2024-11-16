@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.ironbit.files.FileExtension;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.Map.Entry;
 
 import java.util.*;
@@ -19,7 +19,11 @@ public class Verifier {
 
     private Map<String, Set<String>> createMap() {
         Map<String, Set<String>> map = new HashMap<>();
-        File jsonFile = new File("src/main/resources/FileTypes.json");
+
+
+        File jsonFile = loadJsonTypeFile();
+
+
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode rootNode = mapper.readTree(jsonFile);
@@ -53,5 +57,30 @@ public class Verifier {
         return map.containsKey(f1Extension.toUpperCase());
     }
 
+    private File loadJsonTypeFile() {
+        String resourceName = "FileTypes.json";
+
+        // Load the resource as a stream
+        File tempFile;
+        try (InputStream resourceStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
+
+            if (resourceStream == null) {
+                throw new IllegalArgumentException("Resource not found: " + resourceName);
+            }
+
+            tempFile = Files.createTempFile("resource-", resourceName).toFile();
+
+            try (FileOutputStream outStream = new FileOutputStream(tempFile)) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = resourceStream.read(buffer)) != -1) {
+                    outStream.write(buffer, 0, bytesRead);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return tempFile;
+    }
 
 }
