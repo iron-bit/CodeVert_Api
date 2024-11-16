@@ -1,7 +1,7 @@
-package es.codevert.api;
+package es.codevert_api;
 
 public class FileConverter {
-    FileConverter(){
+    public FileConverter(){
         System.out.println("Ready to convert files");
     }
 }
