@@ -2,7 +2,10 @@ package com.github.ironbit.files;
 
 public class XmlFile extends CodeVertFile {
     public XmlFile() {
-        super("XMLFile", "xml", "xml content", "xml path");
+        super("XMLFile", "XML", "xml content", "xml path");
+    }
+    public XmlFile(String fileName, String fileContent, String filePath) {
+        super(fileName, "XML", fileContent, filePath);
     }
 
     @Override

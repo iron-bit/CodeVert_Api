@@ -11,6 +11,7 @@ public class FileConverter {
         FileExtension file2Extension = verifier.verifyExtensionCompatibility(extension, file2StringExtension);
         if (file2Extension != null) {
             CodeVertFile file2 = file1.convertTo(file2Extension);
+            file2.saveFile();
             System.out.println("File converted to " + file2Extension.name() + " successfully.");
 
             System.out.println("File 1: " + file1);
