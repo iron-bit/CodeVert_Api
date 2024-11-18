@@ -1,9 +1,19 @@
 package com.github.ironbit.files;
 
+import java.io.*;
+
 public class JsonFile extends CodeVertFile {
 
     public JsonFile() {
         super("JsonFile", "JSON", "JsonFile content", "JsonFile path");
+    }
+
+    public JsonFile(String fileName, String fileContent, String filePath) {
+        super(fileName, "JSON", fileContent, filePath);
+    }
+
+    public JsonFile(File userFile) {
+        super(userFile);
     }
 
     @Override
@@ -18,7 +28,25 @@ public class JsonFile extends CodeVertFile {
     }
 
     private CodeVertFile transformToTxt() {
-        return new JsonFile();
+        CodeVertFile txtFile;
+        try {
+            txtFile = new TxtFile();
+            txtFile.setFilePath(this.filePath);
+            txtFile.setFileName(this.fileName);
+
+            //Ns si hacerlo asi
+            BufferedReader reader = new BufferedReader(new FileReader(this.filePath + this.fileName + "." + this.fileExtension));
+
+            StringBuilder content = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+            txtFile.setFileContent(content.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return txtFile;
     }
 
     private CodeVertFile transformToCsv() {

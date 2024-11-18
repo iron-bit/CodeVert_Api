@@ -1,7 +1,8 @@
 {
   "JSON": [
     "CSV",
-    "XML"
+    "XML",
+    "TXT"
   ],
   "CSV": [
     "JSON",
