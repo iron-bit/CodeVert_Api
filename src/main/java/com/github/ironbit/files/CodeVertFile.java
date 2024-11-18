@@ -5,10 +5,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public abstract class CodeVertFile {
-    String fileName;
-    String fileExtension;
-    String fileContent;
-    String filePath;
+    protected String fileName;
+    protected String fileExtension;
+    protected String fileContent;
+    protected String filePath;
 
     public CodeVertFile(String fileName, String fileExtension, String fileContent, String filePath) {
         this.fileName = fileName;

@@ -12,6 +12,7 @@ public class Main {
 
         CodeVertFile file = new JsonFile(userFile);
 
-        FileConverter converter = new FileConverter(file, "xml");
+        FileConverter converter = new FileConverter();
+        converter.convert(file, "XML");
     }
 }

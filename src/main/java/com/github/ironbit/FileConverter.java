@@ -4,10 +4,14 @@ import com.github.ironbit.files.CodeVertFile;
 import com.github.ironbit.files.FileExtension;
 
 public class FileConverter {
-    public FileConverter(CodeVertFile file1, String file2StringExtension) {
+    private final Verifier verifier;
+    public FileConverter() {
+        this.verifier = new Verifier();
+    }
+
+    public void convert(CodeVertFile file1, String file2StringExtension){
         String extension = file1.getFileExtension().toUpperCase();
 
-        Verifier verifier = new Verifier();
         FileExtension file2Extension = verifier.verifyExtensionCompatibility(extension, file2StringExtension);
         if (file2Extension != null) {
             CodeVertFile file2 = file1.convertTo(file2Extension);
@@ -20,4 +24,5 @@ public class FileConverter {
             System.out.println("File extension not compatible.");
         }
     }
+
 }

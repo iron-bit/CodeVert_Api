@@ -20,9 +20,7 @@ public class Verifier {
     private Map<String, Set<String>> createMap() {
         Map<String, Set<String>> map = new HashMap<>();
 
-
-        File jsonFile = loadJsonTypeFile();
-
+        File jsonFile = loadJsonResource();
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -57,26 +55,25 @@ public class Verifier {
         return map.containsKey(f1Extension.toUpperCase());
     }
 
-    private File loadJsonTypeFile() {
+    private File loadJsonResource() {
         String resourceName = "FileTypes.json";
 
-        // Load the resource as a stream
         File tempFile;
         try (InputStream resourceStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
 
-            if (resourceStream == null) {
-                throw new IllegalArgumentException("Resource not found: " + resourceName);
-            }
+//            if (resourceStream == null) {
+//                throw new IllegalArgumentException("Resource not found: " + resourceName);
+//            }
 
             tempFile = Files.createTempFile("resource-", resourceName).toFile();
 
-            try (FileOutputStream outStream = new FileOutputStream(tempFile)) {
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = resourceStream.read(buffer)) != -1) {
-                    outStream.write(buffer, 0, bytesRead);
-                }
+            FileOutputStream outStream = new FileOutputStream(tempFile);
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = resourceStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, bytesRead);
             }
+            outStream.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
