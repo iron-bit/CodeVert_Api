@@ -1,22 +1,28 @@
 package com.github.ironbit;
 
-import com.github.ironbit.files.CodeVertFile;
-import com.github.ironbit.files.FileExtension;
+import java.io.File;
 
 public class FileConverter {
     private final Verifier verifier;
+
     public FileConverter() {
         this.verifier = new Verifier();
     }
 
-    public void convert(CodeVertFile file1, String file2StringExtension){
-        String extension = file1.getFileExtension().toUpperCase();
+    public void convert(CodeVertFile file1, String strExtension2){
+        String strExtension1 = file1.getFileExtension().toUpperCase();
 
-        FileExtension file2Extension = verifier.verifyExtensionCompatibility(extension, file2StringExtension);
-        if (file2Extension != null) {
-            CodeVertFile file2 = file1.convertTo(file2Extension);
+        FileExtension extension1 = verifier.verifyExtension(strExtension1);
+        FileExtension extension2 = verifier.verifyExtension(strExtension2);
+        boolean isCompatible = false;
+        if (extension2 != null && extension1 != null) {
+            isCompatible = verifier.verifyExtensionCompatibility(extension1, extension2);
+        }
+
+        if (isCompatible) {
+            CodeVertFile file2 = file1.convertTo(extension2);
             file2.saveFile();
-            System.out.println("File converted to " + file2Extension.name() + " successfully.");
+            System.out.println("File converted to " + extension2.name() + " successfully.");
 
             System.out.println("File 1: " + file1);
             System.out.println("File 2: " + file2);
@@ -25,4 +31,14 @@ public class FileConverter {
         }
     }
 
+    public CodeVertFile prepareFile(File file){
+        String strExtension = file.getName().substring(file.getName().lastIndexOf(".") + 1).toUpperCase();
+        FileExtension extension = verifier.verifyExtension(strExtension);
+        return switch (extension) {
+            case JSON -> new JsonFile(file);
+            case XML -> new XmlFile(file);
+            case TXT -> new TxtFile(file);
+            default -> null;
+        };
+    }
 }

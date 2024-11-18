@@ -2,7 +2,6 @@ package prueba;
 
 import com.github.ironbit.CodeVertFile;
 import com.github.ironbit.FileConverter;
-import com.github.ironbit.JsonFile;
 
 import java.io.File;
 
@@ -13,8 +12,7 @@ public class Main {
 
         FileConverter converter = new FileConverter();
 
-        JsonFile file = new JsonFile(userFile);
-
+        CodeVertFile file = converter.prepareFile(userFile);
         converter.convert(file, "XML");
     }
 }

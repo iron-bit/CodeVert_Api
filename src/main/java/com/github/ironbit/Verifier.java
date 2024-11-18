@@ -2,7 +2,6 @@ package com.github.ironbit;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.ironbit.files.FileExtension;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -10,7 +9,7 @@ import java.util.Map.Entry;
 
 import java.util.*;
 
-public class Verifier {
+class Verifier {
     Map<String, Set<String>> map;
 
     public Verifier() {
@@ -41,18 +40,19 @@ public class Verifier {
         return map;
     }
 
-    public FileExtension verifyExtensionCompatibility(String f1Extension, String f2Extension){
-        f1Extension = f1Extension.toUpperCase();
-        f2Extension = f2Extension.toUpperCase();
-        if (map.containsKey(f1Extension)){
-            if (map.get(f1Extension).contains(f2Extension)){
-                return FileExtension.valueOf(f2Extension);
-            }
+    public FileExtension verifyExtension(String extension){
+        if (FileExtension.contains(extension.toUpperCase())) {
+            return FileExtension.valueOf(extension.toUpperCase());
         }
         return null;
     }
-    public boolean verifyExtension(String f1Extension){
-        return map.containsKey(f1Extension.toUpperCase());
+
+    public boolean verifyExtensionCompatibility(FileExtension ext1, FileExtension ext2){
+        //este if en realidad no se necesita, pero por si acaso
+        if (map.containsKey(ext1.name())){
+            return map.get(ext1.name()).contains(ext2.name());
+        }
+        return false;
     }
 
     private File loadJsonResource() {
@@ -60,11 +60,6 @@ public class Verifier {
 
         File tempFile;
         try (InputStream resourceStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
-
-//            if (resourceStream == null) {
-//                throw new IllegalArgumentException("Resource not found: " + resourceName);
-//            }
-
             tempFile = Files.createTempFile("resource-", resourceName).toFile();
 
             FileOutputStream outStream = new FileOutputStream(tempFile);

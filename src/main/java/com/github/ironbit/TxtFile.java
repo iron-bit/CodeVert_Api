@@ -1,22 +1,25 @@
-package com.github.ironbit.files;
+package com.github.ironbit;
 
-public class TxtFile extends CodeVertFile {
+import java.io.File;
+
+class TxtFile extends CodeVertFile {
     public TxtFile() {
         super("TxtFile", "TXT", "Txt content", "Txt path");
     }
-
     public TxtFile(String fileName, String fileContent, String filePath) {
         super(fileName, "TXT", fileContent, filePath);
     }
+    public TxtFile(File userFile) {
+        super(userFile);
+    }
 
     @Override
-    public CodeVertFile convertTo(FileExtension extension) {
+    CodeVertFile convertTo(FileExtension extension) {
         return switch (extension) {
             case JSON -> transformToJson();
             case TXT -> transformToTxt();//No funcionan
             case CSV -> transformToCsv();
             case XML -> transformToXml();
-            default -> null;
         };
     }
 

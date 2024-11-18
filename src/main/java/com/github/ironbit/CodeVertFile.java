@@ -1,4 +1,4 @@
-package com.github.ironbit.files;
+package com.github.ironbit;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -25,9 +25,9 @@ public abstract class CodeVertFile {
         this.filePath = f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf("/") + 1);
     }
 
-    public abstract CodeVertFile convertTo(FileExtension file);
+    abstract CodeVertFile convertTo(FileExtension file);
 
-    public boolean saveFile() {
+    boolean saveFile() {
         File f = new File(this.filePath + this.fileName + "." + this.fileExtension);
 //        if (f.exists()){
 //            //hacer un bucle para añadir _1 ...
@@ -43,25 +43,28 @@ public abstract class CodeVertFile {
     public String getFilePath() {
         return filePath;
     }
-    public void setFilePath(String filePath) {
+    void setFilePath(String filePath) {
         this.filePath = filePath;
     }
+
     public String getFileContent() {
         return fileContent;
     }
-    public void setFileContent(String fileContent) {
+     void setFileContent(String fileContent) {
         this.fileContent = fileContent;
     }
+
     public String getFileExtension() {
         return fileExtension;
     }
-    public void setFileExtension(String fileExtension) {
+    void setFileExtension(String fileExtension) {
         this.fileExtension = fileExtension;
     }
+
     public String getFileName() {
         return fileName;
     }
-    public void setFileName(String fileName) {
+    void setFileName(String fileName) {
         this.fileName = fileName;
     }
 

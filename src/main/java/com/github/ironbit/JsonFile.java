@@ -1,23 +1,20 @@
-package com.github.ironbit.files;
+package com.github.ironbit;
 
 import java.io.*;
 
-public class JsonFile extends CodeVertFile {
-
+class JsonFile extends CodeVertFile {
     public JsonFile() {
         super("JsonFile", "JSON", "JsonFile content", "JsonFile path");
     }
-
     public JsonFile(String fileName, String fileContent, String filePath) {
         super(fileName, "JSON", fileContent, filePath);
     }
-
     public JsonFile(File userFile) {
         super(userFile);
     }
 
     @Override
-    public CodeVertFile convertTo(FileExtension extension) {
+    CodeVertFile convertTo(FileExtension extension) {
         return switch (extension) {
             case JSON -> transformToJson();
             case XML -> transformToXml();
