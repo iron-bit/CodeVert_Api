@@ -9,23 +9,14 @@ public class FileConverter {
         this.verifier = new Verifier();
     }
 
-    public void convert(CodeVertFile file1, String strExtension2){
-        String strExtension1 = file1.getFileExtension().toUpperCase();
-
-        FileExtension extension1 = verifier.verifyExtension(strExtension1);
-        FileExtension extension2 = verifier.verifyExtension(strExtension2);
-        boolean isCompatible = false;
-        if (extension2 != null && extension1 != null) {
-            isCompatible = verifier.verifyExtensionCompatibility(extension1, extension2);
-        }
+    public void convert(CodeVertFile file1, FileExtension extension2){
+        boolean isCompatible = verifier.verifyExtensionCompatibility(file1.getFileExtension(), extension2);
 
         if (isCompatible) {
             CodeVertFile file2 = file1.convertTo(extension2);
             file2.saveFile();
             System.out.println("File converted to " + extension2.name() + " successfully.");
-
-            System.out.println("File 1: " + file1);
-            System.out.println("File 2: " + file2);
+            System.out.println("File saved in " + file2.getFilePath());
         } else {
             System.out.println("File extension not compatible.");
         }

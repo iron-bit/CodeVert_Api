@@ -4,10 +4,10 @@ import java.io.File;
 
 class TxtFile extends CodeVertFile {
     public TxtFile() {
-        super("TxtFile", "TXT", "Txt content", "Txt path");
+        super("TxtFile", FileExtension.TXT, "Txt content", "Txt path");
     }
     public TxtFile(String fileName, String fileContent, String filePath) {
-        super(fileName, "TXT", fileContent, filePath);
+        super(fileName, FileExtension.TXT, fileContent, filePath);
     }
     public TxtFile(File userFile) {
         super(userFile);

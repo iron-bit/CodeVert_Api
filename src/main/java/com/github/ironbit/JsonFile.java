@@ -4,10 +4,10 @@ import java.io.*;
 
 class JsonFile extends CodeVertFile {
     public JsonFile() {
-        super("JsonFile", "JSON", "JsonFile content", "JsonFile path");
+        super("JsonFile", FileExtension.JSON, "JsonFile content", "JsonFile path");
     }
     public JsonFile(String fileName, String fileContent, String filePath) {
-        super(fileName, "JSON", fileContent, filePath);
+        super(fileName, FileExtension.JSON, fileContent, filePath);
     }
     public JsonFile(File userFile) {
         super(userFile);

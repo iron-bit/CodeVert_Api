@@ -4,10 +4,10 @@ import java.io.File;
 
 class XmlFile extends CodeVertFile {
     public XmlFile() {
-        super("XMLFile", "XML", "xml content", "xml path");
+        super("XMLFile", FileExtension.XML, "xml content", "xml path");
     }
     public XmlFile(String fileName, String fileContent, String filePath) {
-        super(fileName, "XML", fileContent, filePath);
+        super(fileName, FileExtension.XML, fileContent, filePath);
     }
     public XmlFile(File userFile) {
         super(userFile);

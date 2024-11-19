@@ -74,5 +74,4 @@ class Verifier {
         }
         return tempFile;
     }
-
 }

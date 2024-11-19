@@ -6,11 +6,11 @@ import java.io.IOException;
 
 public abstract class CodeVertFile {
     protected String fileName;
-    protected String fileExtension;
+    protected FileExtension fileExtension;
     protected String fileContent;
     protected String filePath;
 
-    public CodeVertFile(String fileName, String fileExtension, String fileContent, String filePath) {
+    public CodeVertFile(String fileName, FileExtension fileExtension, String fileContent, String filePath) {
         this.fileName = fileName;
         this.fileExtension = fileExtension;
         this.fileContent = fileContent;
@@ -21,7 +21,10 @@ public abstract class CodeVertFile {
 
     public CodeVertFile(File f){
         this.fileName = f.getName().substring(0, f.getName().lastIndexOf("."));
-        this.fileExtension = (f.getName().substring(f.getName().lastIndexOf(".") + 1)).toUpperCase();
+        String ext = (f.getName().substring(f.getName().lastIndexOf(".") + 1)).toUpperCase();
+        if (FileExtension.contains(ext)) {
+            this.fileExtension = FileExtension.valueOf(ext);
+        }
         this.filePath = f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf("/") + 1);
     }
 
@@ -50,14 +53,14 @@ public abstract class CodeVertFile {
     public String getFileContent() {
         return fileContent;
     }
-     void setFileContent(String fileContent) {
+    void setFileContent(String fileContent) {
         this.fileContent = fileContent;
     }
 
-    public String getFileExtension() {
+    public FileExtension getFileExtension() {
         return fileExtension;
     }
-    void setFileExtension(String fileExtension) {
+    void setFileExtension(FileExtension fileExtension) {
         this.fileExtension = fileExtension;
     }
 
