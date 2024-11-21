@@ -13,19 +13,20 @@ import java.util.*;
  * Class that verifies the compatibility of file extensions
  */
 class Verifier {
-    Map<String, Set<String>> map;
+    Map<FileExtension, Set<FileExtension>> map;
 
     public Verifier() {
         this.map = createMap();
     }
 
     /**
-     * Creates a map with file extensions and their compatibilities
+     * Creates a map with file extensions and their compatibilities.
      *
-     * @return a {@code Map} with file extensions and their compatibilities
+     * @return a {@code Map<FileExtension, Set<FileExtension>>} with file extensions and their compatibilities.
+     * @throws IllegalArgumentException if the JSON resource cannot be parsed.
      */
-    private Map<String, Set<String>> createMap() {
-        Map<String, Set<String>> map = new HashMap<>();
+    private Map<FileExtension, Set<FileExtension>> createMap() throws IllegalArgumentException{
+        Map<FileExtension, Set<FileExtension>> map = new HashMap<>();
 
         File jsonFile = loadJsonResource();
 
@@ -35,12 +36,14 @@ class Verifier {
             Iterator<Entry<String, JsonNode>> fields = rootNode.fields();
             while (fields.hasNext()) {
                 Entry<String, JsonNode> field = fields.next();
-                Set<String> set = new HashSet<>();
+                Set<FileExtension> values = new HashSet<>();
 
                 for (JsonNode internalNode : field.getValue()){
-                    set.add(internalNode.asText().toUpperCase());
+                    FileExtension value = FileExtension.valueOf(internalNode.asText().toUpperCase());
+                    values.add(value);
                 }
-                map.put(field.getKey().toUpperCase(), set);
+                FileExtension key = FileExtension.valueOf(field.getKey().toUpperCase());
+                map.put(key, values);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -69,11 +72,7 @@ class Verifier {
      * @return {@code true} if the extensions are compatible, otherwise {@code false}
      */
     public boolean verifyExtensionCompatibility(FileExtension ext1, FileExtension ext2){
-        //este if en realidad no se necesita, pero por si acaso
-        if (map.containsKey(ext1.name())){
-            return map.get(ext1.name()).contains(ext2.name());
-        }
-        return false;
+        return map.get(ext1).contains(ext2);
     }
 
     /**
