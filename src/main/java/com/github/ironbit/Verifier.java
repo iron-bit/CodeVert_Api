@@ -9,6 +9,9 @@ import java.util.Map.Entry;
 
 import java.util.*;
 
+/**
+ * Class that verifies the compatibility of file extensions
+ */
 class Verifier {
     Map<String, Set<String>> map;
 
@@ -16,6 +19,11 @@ class Verifier {
         this.map = createMap();
     }
 
+    /**
+     * Creates a map with file extensions and their compatibilities
+     *
+     * @return a {@code Map} with file extensions and their compatibilities
+     */
     private Map<String, Set<String>> createMap() {
         Map<String, Set<String>> map = new HashMap<>();
 
@@ -40,6 +48,12 @@ class Verifier {
         return map;
     }
 
+    /**
+     * Verifies if the given extension is a valid FileExtension.
+     *
+     * @param extension the file extension to verify
+     * @return the corresponding {@code FileExtension} if valid, otherwise {@code null}
+     */
     public FileExtension verifyExtension(String extension){
         if (FileExtension.contains(extension.toUpperCase())) {
             return FileExtension.valueOf(extension.toUpperCase());
@@ -47,6 +61,13 @@ class Verifier {
         return null;
     }
 
+    /**
+     * Verifies if the given extensions are compatible.
+     *
+     * @param ext1 the first file extension
+     * @param ext2 the second file extension
+     * @return {@code true} if the extensions are compatible, otherwise {@code false}
+     */
     public boolean verifyExtensionCompatibility(FileExtension ext1, FileExtension ext2){
         //este if en realidad no se necesita, pero por si acaso
         if (map.containsKey(ext1.name())){
@@ -55,6 +76,11 @@ class Verifier {
         return false;
     }
 
+    /**
+     * Loads the JSON resource FileTypes.json
+     *
+     * @return the {@link java.io.File} object representing the JSON resource
+     */
     private File loadJsonResource() {
         String resourceName = "FileTypes.json";
 
@@ -65,7 +91,9 @@ class Verifier {
             FileOutputStream outStream = new FileOutputStream(tempFile);
             byte[] buffer = new byte[1024];
             int bytesRead;
-            while ((bytesRead = resourceStream.read(buffer)) != -1) {
+            while (true) {
+                assert resourceStream != null;
+                if ((bytesRead = resourceStream.read(buffer)) == -1) break;
                 outStream.write(buffer, 0, bytesRead);
             }
             outStream.close();
