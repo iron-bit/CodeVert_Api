@@ -4,7 +4,7 @@ package com.github.ironbit;
  * Enum that contains the file extensions that can be handled.
  */
 public enum FileExtension {
-    JSON, XML, CSV, TXT;
+    JSON, XML, CSV, TXT, MP3, WAV;
 
     /**
      * Checks if the given value is a valid file extension.
