@@ -20,6 +20,7 @@ class TxtFile extends CodeVertFile {
             case TXT -> transformToTxt();//No funcionan
             case CSV -> transformToCsv();
             case XML -> transformToXml();
+            default -> null;
         };
     }
 
