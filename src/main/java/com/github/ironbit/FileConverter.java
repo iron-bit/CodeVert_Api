@@ -48,7 +48,7 @@ public class FileConverter {
             case JSON -> new JsonFile(file);
             case XML -> new XmlFile(file);
             case TXT -> new TxtFile(file);
-            default -> null;
+            default -> throw new CodeVertException("Unsupported file extension.");
         };
     }
 }
