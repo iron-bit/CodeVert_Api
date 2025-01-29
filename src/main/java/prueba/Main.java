@@ -9,9 +9,9 @@ import java.io.File;
 public class Main {
     public static void main(String[] args) {
         //Creamos el objeto al ejecutar el evento de Drag and Drop
-        File userFile = new File("/home/tymur/Documents/Api_Try/GUESTS.JSON");
+        File userFile = new File("C:/Users/Javi/Desktop/lupita.mp3");
         FileConverter fileConverter = new FileConverter();
         CodeVertFile file = fileConverter.prepareFile(userFile);
-        fileConverter.convert(file, FileExtension.TXT);
+        fileConverter.convert(file, FileExtension.WAV);
     }
 }

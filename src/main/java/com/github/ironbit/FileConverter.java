@@ -48,6 +48,8 @@ public class FileConverter {
             case JSON -> new JsonFile(file);
             case XML -> new XmlFile(file);
             case TXT -> new TxtFile(file);
+            case MP3 -> new Mp3File(file);
+            case WAV -> new WavFile(file);
             default -> throw new CodeVertException("Unsupported file extension.");
         };
     }
