@@ -3,15 +3,5 @@
     "CSV",
     "XML",
     "TXT"
-  ],
-  "CSV": [
-    "JSON",
-    "XML"
-  ],
-  "MP3": [
-    "WAV"
-  ],
-  "WAV": [
-    "MP3"
   ]
 }
