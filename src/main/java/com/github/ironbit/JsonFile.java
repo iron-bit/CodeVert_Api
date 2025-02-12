@@ -84,7 +84,7 @@ class JsonFile extends CodeVertFile {
     }
 
     private CodeVertFile transformToCsv(String jsonKey) {
-        JsonToCsvTransformer jsonToCsvTransformer = new JsonToCsvTransformer(this.filePath, this.fileName, this.fileExtension.toString());
+        JsonToCsvTransformer jsonToCsvTransformer = new JsonToCsvTransformer(this.filePath, this.fileName, this.fileExtension.toString(), this);
         jsonToCsvTransformer.transformToCsv(jsonKey);
         return new TxtFile();
     }

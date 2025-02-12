@@ -1,6 +1,7 @@
 package com.github.ironbit;
 
 import java.io.File;
+import java.util.Set;
 
 /**
  * Class responsible for converting files from one type to another.
@@ -34,7 +35,6 @@ public class FileConverter {
 //            System.out.println("File extension not compatible.");
         }
     }
-
     /**
      * Prepares a CodeVertFile instance from the given file based on its extension.
      *
@@ -50,5 +50,9 @@ public class FileConverter {
 //            case TXT -> new TxtFile(file);
             default -> throw new CodeVertException("Unsupported file extension.");
         };
+    }
+
+    public Set<FileExtension> getCompatibleExtensions(CodeVertFile file) {
+        return verifier.getCompatibilityArray(file);
     }
 }

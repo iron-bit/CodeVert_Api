@@ -101,4 +101,9 @@ class Verifier {
         }
         return tempFile;
     }
+
+    public Set<FileExtension> getCompatibilityArray(CodeVertFile file) {
+        FileExtension extension = file.fileExtension;
+        return map.get(extension);
+    }
 }
