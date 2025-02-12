@@ -32,10 +32,11 @@ public abstract class CodeVertFile {
     /**
      * Converts the file to another file type.
      *
-     * @param file The file type to convert to.
+     * @param file        The file type to convert to.
+     * @param selectedKey
      * @return The converted file.
      */
-    abstract CodeVertFile convertTo(FileExtension file);
+    abstract CodeVertFile convertTo(FileExtension file, String selectedKey);
 
     /**
      * Saves the file in the specified path.
@@ -43,7 +44,7 @@ public abstract class CodeVertFile {
      * @return {@code true} if the file was saved successfully, {@code false} otherwise.
      */
     boolean saveFile() {
-        File f = findFileName();
+        File f = new File(findFileName(this.fileExtension));
         try (FileWriter writer = new FileWriter(f)){
             writer.write(this.fileContent);
             return true;
@@ -55,12 +56,12 @@ public abstract class CodeVertFile {
     /**
      * Finds a file name that does not exist in the specified path.
      *
-     * @return A {@link java.io.File} with a name that does not exist in the specified path.
+     * @return A String with a name that does not exist in the specified path.
      */
-    private File findFileName(){
-        File f = new File(this.filePath + this.fileName + "." + this.fileExtension);
+    protected String findFileName(FileExtension fileExtension){
+        File f = new File(this.filePath + this.fileName + "." + fileExtension.toString().toLowerCase());
         if (!f.exists()){
-            return f;
+            return f.getAbsolutePath();
         }
 
         int i = 1;
@@ -68,7 +69,11 @@ public abstract class CodeVertFile {
             f = new File(this.filePath + this.fileName + "_" + i + "." + this.fileExtension);
             i++;
         }
-        return f;
+        return f.getAbsolutePath();
+    }
+
+    protected String getFullFilePath(){
+        return this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
     }
 
     public String getFilePath() {

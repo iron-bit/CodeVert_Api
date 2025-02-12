@@ -14,7 +14,7 @@ class XmlFile extends CodeVertFile {
     }
 
     @Override
-    CodeVertFile convertTo(FileExtension extension) {
+    CodeVertFile convertTo(FileExtension extension, String selectedKey) {
         return switch (extension) {
             case JSON -> transformToJson();
             case XML -> transformToXml();//No funcionan
