@@ -66,7 +66,7 @@ public abstract class CodeVertFile {
 
         int i = 1;
         while (f.exists()){
-            f = new File(this.filePath + this.fileName + "_" + i + "." + this.fileExtension);
+            f = new File(this.filePath + this.fileName + "_" + i + "." + fileExtension.toString().toLowerCase());
             i++;
         }
         return f.getAbsolutePath();
