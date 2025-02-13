@@ -26,7 +26,8 @@ public abstract class CodeVertFile {
         if (FileExtension.contains(ext)) {
             this.fileExtension = FileExtension.valueOf(ext);
         }
-        this.filePath = f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf("/") + 1);
+        String separator = System.getProperty("os.name").contains("Windows") ? "\\" : "/";
+        this.filePath = f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf(separator) + 1);
     }
 
     /**
