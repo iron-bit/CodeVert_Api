@@ -52,29 +52,48 @@ class JsonFile extends CodeVertFile {
             case JSON -> transformToJson();
             case XML -> transformToXml(selectedKey);
             case CSV -> transformToCsv(selectedKey);
-            case TXT -> transformToTxt();
+            case TXT -> transformToTxt(selectedKey);
         }
     }
 
-    private void transformToTxt() {
-//        CodeVertFile txtFile;
-//        try {
-//            txtFile = new TxtFile();
-//            txtFile.setFilePath(this.filePath);
-//            txtFile.setFileName(this.fileName);
-//
-//            //Ns si hacerlo asi
-//            BufferedReader reader = new BufferedReader(new FileReader(this.filePath + this.fileName + "." + this.fileExtension));
-//
-//            StringBuilder content = new StringBuilder();
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                content.append(line).append("\n");
-//            }
-//            txtFile.setFileContent(content.toString());
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+    private void transformToTxt(String selectedKey) {
+        String jsonFilePath = this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
+        String txtFilePath = this.findFileName(FileExtension.TXT);
+
+        ObjectMapper jsonMapper = new ObjectMapper();
+
+        try {
+            JsonNode rootNode = jsonMapper.readTree(new File(jsonFilePath));
+            JsonNode targetNode = extractTargetNode(selectedKey, rootNode);
+
+            StringBuilder txtContent = new StringBuilder();
+            convertJsonNodeToTxt(targetNode, txtContent, "");
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(txtFilePath))) {
+                writer.write(txtContent.toString());
+            }
+
+            System.out.println("JSON successfully converted to TXT and saved as: " + txtFilePath);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error during conversion: " + e.getMessage());
+        }
+    }
+
+    private void convertJsonNodeToTxt(JsonNode node, StringBuilder txtContent, String indent) {
+        if (node.isObject()) {
+            node.fields().forEachRemaining(field -> {
+                txtContent.append(indent).append(field.getKey()).append(": ");
+                convertJsonNodeToTxt(field.getValue(), txtContent, indent + "  ");
+            });
+        } else if (node.isArray()) {
+            node.forEach(element -> {
+                convertJsonNodeToTxt(element, txtContent, indent + "- ");
+            });
+        } else {
+            txtContent.append(node.asText()).append("\n");
+        }
     }
 
     private void transformToCsv(String jsonKey) {
