@@ -8,10 +8,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 class JsonFile extends CodeVertFile {
 
@@ -120,8 +117,7 @@ class JsonFile extends CodeVertFile {
         }
     }
 
-    private CodeVertFile transformToJson() {
-        return new JsonFile();
+    private void transformToJson() {
     }
 
 
@@ -139,7 +135,7 @@ class JsonFile extends CodeVertFile {
             this.parent = parent;
         }
 
-        public CodeVertFile transformToCsv(String jsonKey) {
+        public void transformToCsv(String jsonKey) {
             String jsonFilePath = parent.getFullFilePath();
             String csvFilePath = parent.findFileName(FileExtension.CSV);
 
@@ -156,6 +152,8 @@ class JsonFile extends CodeVertFile {
                     writeObjectToCsv(csvMapper, targetNode, csvFilePath);
                 } else if (targetNode.isArray()) {
                     writeArrayToCsv(csvMapper, targetNode, csvFilePath);
+                } else if (targetNode.isValueNode()) {  // Handle single values (strings, numbers, booleans)
+                    writeSingleValueToCsv(csvMapper, jsonKey, targetNode, csvFilePath);
                 } else {
                     System.err.println("Unsupported JSON structure for CSV conversion.");
                 }
@@ -166,17 +164,63 @@ class JsonFile extends CodeVertFile {
                 e.printStackTrace();
                 System.err.println("Error during conversion: " + e.getMessage());
             }
-            return new TxtFile();
+        }
+
+        private void writeSingleValueToCsv(CsvMapper csvMapper, String key, JsonNode valueNode, String csvFilePath) throws IOException {
+            CsvSchema schema = CsvSchema.builder().addColumn("Key").addColumn("Value").build()
+                    .withHeader().withColumnSeparator(';');
+
+            List<Map<String, String>> data = new ArrayList<>();
+            Map<String, String> row = new LinkedHashMap<>();
+            row.put("Key", key);
+            row.put("Value", valueNode.asText());
+            data.add(row);
+
+            csvMapper.writer(schema).writeValue(new File(csvFilePath), data);
         }
 
         private JsonNode extractTargetNode(String jsonKey, JsonNode rootNode) {
-            if (jsonKey == null || jsonKey.isEmpty()) {
+            if (jsonKey == null || jsonKey.isEmpty() || rootNode == null) {
                 return rootNode;
             }
 
-            JsonNode targetNode = rootNode.path("menu").path("popup").path(jsonKey);
-            return targetNode.isMissingNode() ? rootNode : targetNode;
+            // Direct match at the root level
+            if (rootNode.has(jsonKey)) {
+                return rootNode.get(jsonKey);
+            }
+
+            // Recursive search in all fields and arrays
+            JsonNode foundNode = recursiveSearch(jsonKey, rootNode);
+            if (foundNode == null) {
+                System.err.println("Filtering key not found: " + jsonKey);
+            }
+            return foundNode;
         }
+
+        private JsonNode recursiveSearch(String jsonKey, JsonNode node) {
+            if (node.isObject()) {
+                Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+                while (fields.hasNext()) {
+                    Map.Entry<String, JsonNode> field = fields.next();
+                    if (field.getKey().equals(jsonKey)) {
+                        return field.getValue();
+                    }
+                    JsonNode result = recursiveSearch(jsonKey, field.getValue());
+                    if (result != null) {
+                        return result;
+                    }
+                }
+            } else if (node.isArray()) {
+                for (JsonNode arrayItem : node) {
+                    JsonNode result = recursiveSearch(jsonKey, arrayItem);
+                    if (result != null) {
+                        return result;
+                    }
+                }
+            }
+            return null;  // Key not found in this branch
+        }
+
 
         private void writeObjectToCsv(CsvMapper csvMapper, JsonNode jsonNode, String csvFilePath) throws IOException {
             CsvSchema.Builder schemaBuilder = CsvSchema.builder();
@@ -186,8 +230,8 @@ class JsonFile extends CodeVertFile {
                 schemaBuilder.addColumn(key);
             }
 
-            CsvSchema schema = schemaBuilder.build().withHeader().withoutQuoteChar();
-            csvMapper.writer(schema).writeValue(new File(csvFilePath), flatJson);
+            CsvSchema schema = schemaBuilder.build().withHeader().withoutQuoteChar().withColumnSeparator(';');
+            csvMapper.writer(schema).writeValue(new File(csvFilePath), Collections.singletonList(flatJson));
         }
 
         private Map<String, String> flattenJson(JsonNode jsonNode) {
@@ -213,7 +257,7 @@ class JsonFile extends CodeVertFile {
         }
 
         private void writeArrayToCsv(CsvMapper csvMapper, JsonNode jsonArray, String csvFilePath) throws IOException {
-            CsvSchema schema = generateSchemaFromFirstObject(jsonArray).withoutQuoteChar();
+            CsvSchema schema = generateSchemaFromFirstObject(jsonArray).withoutQuoteChar().withColumnSeparator(';');
             csvMapper.writer(schema).writeValue(new File(csvFilePath), jsonArray);
         }
 
@@ -222,7 +266,6 @@ class JsonFile extends CodeVertFile {
 
             if (!jsonArray.isEmpty() && jsonArray.get(0).isObject()) {
                 JsonNode firstObject = jsonArray.get(0);
-
                 Iterator<Map.Entry<String, JsonNode>> fields = firstObject.fields();
                 while (fields.hasNext()) {
                     schemaBuilder.addColumn(fields.next().getKey());
