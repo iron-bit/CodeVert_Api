@@ -13,8 +13,9 @@ public class Main {
         File userFile = new File("/home/tymur/Documents/CodeVertApi/src/main/resources/smth.json");
         FileConverter fileConverter = new FileConverter();
         CodeVertFile file = fileConverter.prepareFile(userFile);
+        file.getKeys().forEach(System.out::println);
         Set<FileExtension> compatibleExtensions = fileConverter.getCompatibleExtensions(file);
         compatibleExtensions.forEach(System.out::println);
-        fileConverter.convert(file, FileExtension.CSV, "menuitem");
+        fileConverter.convert(file, FileExtension.CSV, "popup");
     }
 }

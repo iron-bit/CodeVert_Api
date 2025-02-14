@@ -4,39 +4,32 @@ import java.io.File;
 
 class XmlFile extends CodeVertFile {
     public XmlFile() {
-        super("XMLFile", FileExtension.XML, "xml content", "xml path");
+        super("XMLFile", FileExtension.XML, "xml path");
     }
+
     public XmlFile(String fileName, String fileContent, String filePath) {
-        super(fileName, FileExtension.XML, fileContent, filePath);
+        super(fileName, FileExtension.XML, filePath);
     }
+
     public XmlFile(File userFile) {
         super(userFile);
     }
 
     @Override
-    CodeVertFile convertTo(FileExtension extension, String selectedKey) {
-        return switch (extension) {
+    void convertTo(FileExtension fileExtension, String selectedKey) {
+        switch (fileExtension) {
             case JSON -> transformToJson();
             case XML -> transformToXml();//No funcionan
             case CSV -> transformToCsv();
             case TXT -> transformToTxt();
-            default -> null;
-        };
+        }
     }
 
-    private CodeVertFile transformToTxt() {
-        return new JsonFile();
-    }
+    private void transformToTxt() {}
 
-    private CodeVertFile transformToCsv() {
-        return new JsonFile();
-    }
+    private void transformToCsv() {}
 
-    private CodeVertFile transformToXml() {
-        return new JsonFile();
-    }
+    private void transformToXml() {}
 
-    private CodeVertFile transformToJson() {
-        return new JsonFile();
-    }
+    private void transformToJson() {}
 }

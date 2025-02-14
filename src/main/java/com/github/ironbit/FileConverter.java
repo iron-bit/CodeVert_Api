@@ -27,7 +27,7 @@ public class FileConverter {
         boolean isCompatible = verifier.verifyExtensionCompatibility(file1.getFileExtension(), extension2);
 
         if (isCompatible) {
-            CodeVertFile file2 = file1.convertTo(extension2, selectedKey);
+            file1.convertTo(extension2, selectedKey);
 //            file2.saveFile();
 //            System.out.println("File converted to " + extension2.name() + " successfully.");
 //            System.out.println("File saved in " + file2.getFilePath());

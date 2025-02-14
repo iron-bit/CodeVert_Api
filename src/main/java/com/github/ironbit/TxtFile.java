@@ -4,39 +4,32 @@ import java.io.File;
 
 class TxtFile extends CodeVertFile {
     public TxtFile() {
-        super("TxtFile", FileExtension.TXT, "Txt content", "Txt path");
+        super("TxtFile", FileExtension.TXT, "Txt path");
     }
+
     public TxtFile(String fileName, String fileContent, String filePath) {
-        super(fileName, FileExtension.TXT, fileContent, filePath);
+        super(fileName, FileExtension.TXT, filePath);
     }
+
     public TxtFile(File userFile) {
         super(userFile);
     }
 
     @Override
-    CodeVertFile convertTo(FileExtension extension, String selectedKey) {
-        return switch (extension) {
+    void convertTo(FileExtension fileExtension, String selectedKey) {
+        switch (fileExtension) {
             case JSON -> transformToJson();
             case TXT -> transformToTxt();//No funcionan
             case CSV -> transformToCsv();
             case XML -> transformToXml();
-            default -> null;
-        };
+        }
     }
 
-    private CodeVertFile transformToTxt() {
-        return new JsonFile();
-    }
+    private void transformToTxt() {}
 
-    private CodeVertFile transformToCsv() {
-        return new JsonFile();
-    }
+    private void transformToCsv() {}
 
-    private CodeVertFile transformToXml() {
-        return new JsonFile();
-    }
+    private void transformToXml() {}
 
-    private CodeVertFile transformToJson() {
-        return new JsonFile();
-    }
+    private void transformToJson() {}
 }

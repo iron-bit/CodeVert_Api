@@ -1,8 +1,7 @@
 package com.github.ironbit;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Abstract class that represents a file that can be converted to another file type.
@@ -10,17 +9,16 @@ import java.io.IOException;
 public abstract class CodeVertFile {
     protected String fileName;
     protected FileExtension fileExtension;
-    protected String fileContent;
+    protected ArrayList<String> keys;
     protected String filePath;
 
-    public CodeVertFile(String fileName, FileExtension fileExtension, String fileContent, String filePath) {
+    public CodeVertFile(String fileName, FileExtension fileExtension, String filePath) {
         this.fileName = fileName;
         this.fileExtension = fileExtension;
-        this.fileContent = fileContent;
         this.filePath = filePath;
     }
 
-    public CodeVertFile(File f){
+    public CodeVertFile(File f) {
         this.fileName = f.getName().substring(0, f.getName().lastIndexOf("."));
         String ext = (f.getName().substring(f.getName().lastIndexOf(".") + 1)).toUpperCase();
         if (FileExtension.contains(ext)) {
@@ -31,64 +29,43 @@ public abstract class CodeVertFile {
     }
 
     /**
-     * Converts the file to another file type.
+     * Converts the fileExtension to another fileExtension type.
      *
-     * @param file        The file type to convert to.
-     * @param selectedKey
-     * @return The converted file.
+     * @param fileExtension The fileExtension type to convert to.
+     * @param selectedKey   The key used for filtering.
      */
-    abstract CodeVertFile convertTo(FileExtension file, String selectedKey);
+    abstract void convertTo(FileExtension fileExtension, String selectedKey);
 
-    /**
-     * Saves the file in the specified path.
-     *
-     * @return {@code true} if the file was saved successfully, {@code false} otherwise.
-     */
-    boolean saveFile() {
-        File f = new File(findFileName(this.fileExtension));
-        try (FileWriter writer = new FileWriter(f)){
-            writer.write(this.fileContent);
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
 
     /**
      * Finds a file name that does not exist in the specified path.
      *
      * @return A String with a name that does not exist in the specified path.
      */
-    protected String findFileName(FileExtension fileExtension){
+    protected String findFileName(FileExtension fileExtension) {
         File f = new File(this.filePath + this.fileName + "." + fileExtension.toString().toLowerCase());
-        if (!f.exists()){
+        if (!f.exists()) {
             return f.getAbsolutePath();
         }
 
         int i = 1;
-        while (f.exists()){
+        while (f.exists()) {
             f = new File(this.filePath + this.fileName + "_" + i + "." + fileExtension.toString().toLowerCase());
             i++;
         }
         return f.getAbsolutePath();
     }
 
-    protected String getFullFilePath(){
+    protected String getFullFilePath() {
         return this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
     }
 
     public String getFilePath() {
         return filePath;
     }
+
     void setFilePath(String filePath) {
         this.filePath = filePath;
-    }
-
-    public String getFileContent() {
-        return fileContent;
-    }
-    void setFileContent(String fileContent) {
-        this.fileContent = fileContent;
     }
 
     public FileExtension getFileExtension() {
@@ -98,8 +75,17 @@ public abstract class CodeVertFile {
     public String getFileName() {
         return fileName;
     }
+
     void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public ArrayList<String> getKeys() {
+        return keys;
+    }
+
+    public void setKeys(ArrayList<String> keys) {
+        this.keys = keys;
     }
 
     @Override
@@ -107,7 +93,6 @@ public abstract class CodeVertFile {
         return "CodeVertFile{" +
                 "fileName='" + fileName + '\'' +
                 ", fileExtension='" + fileExtension + '\'' +
-                ", fileContent='" + fileContent + '\'' +
                 ", filePath='" + filePath + '\'' +
                 '}';
     }

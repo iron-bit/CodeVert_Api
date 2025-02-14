@@ -14,19 +14,18 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 class JsonFile extends CodeVertFile {
-    private ArrayList<String> keys;
 
     public JsonFile() {
-        super("JsonFile", FileExtension.JSON, "JsonFile content", "JsonFile path");
+        super("JsonFile", FileExtension.JSON, "JsonFile path");
     }
 
     public JsonFile(String fileName, String fileContent, String filePath) {
-        super(fileName, FileExtension.JSON, fileContent, filePath);
+        super(fileName, FileExtension.JSON, filePath);
     }
 
     public JsonFile(File userFile) {
         super(userFile);
-        this.keys  = new ArrayList<>();
+        this.keys = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
@@ -35,7 +34,7 @@ class JsonFile extends CodeVertFile {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.keys.forEach(System.out::println);
+//        this.keys.forEach(System.out::println);
     }
 
     private void collectKeys(JsonNode node, ArrayList<String> keys) {
@@ -51,45 +50,42 @@ class JsonFile extends CodeVertFile {
 
 
     @Override
-    CodeVertFile convertTo(FileExtension extension, String selectedKey) {
-        return switch (extension) {
+    void convertTo(FileExtension fileExtension, String selectedKey) {
+        switch (fileExtension) {
             case JSON -> transformToJson();
             case XML -> transformToXml(selectedKey);
             case CSV -> transformToCsv(selectedKey);
             case TXT -> transformToTxt();
-            default -> null;
-        };
-    }
-
-    private CodeVertFile transformToTxt() {
-        CodeVertFile txtFile;
-        try {
-            txtFile = new TxtFile();
-            txtFile.setFilePath(this.filePath);
-            txtFile.setFileName(this.fileName);
-
-            //Ns si hacerlo asi
-            BufferedReader reader = new BufferedReader(new FileReader(this.filePath + this.fileName + "." + this.fileExtension));
-
-            StringBuilder content = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                content.append(line).append("\n");
-            }
-            txtFile.setFileContent(content.toString());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
-        return txtFile;
     }
 
-    private CodeVertFile transformToCsv(String jsonKey) {
+    private void transformToTxt() {
+//        CodeVertFile txtFile;
+//        try {
+//            txtFile = new TxtFile();
+//            txtFile.setFilePath(this.filePath);
+//            txtFile.setFileName(this.fileName);
+//
+//            //Ns si hacerlo asi
+//            BufferedReader reader = new BufferedReader(new FileReader(this.filePath + this.fileName + "." + this.fileExtension));
+//
+//            StringBuilder content = new StringBuilder();
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                content.append(line).append("\n");
+//            }
+//            txtFile.setFileContent(content.toString());
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+    }
+
+    private void transformToCsv(String jsonKey) {
         JsonToCsvTransformer jsonToCsvTransformer = new JsonToCsvTransformer(this.filePath, this.fileName, this.fileExtension.toString(), this);
         jsonToCsvTransformer.transformToCsv(jsonKey);
-        return new TxtFile();
     }
 
-    private CodeVertFile transformToXml(String jsonKey) {
+    private void transformToXml(String jsonKey) {
         String jsonFilePath = this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
         String xmlFilePath = this.filePath + this.fileName + "." + FileExtension.XML.toString().toLowerCase();
 
@@ -122,7 +118,6 @@ class JsonFile extends CodeVertFile {
             e.printStackTrace();
             System.err.println("Error during conversion: " + e.getMessage());
         }
-        return new XmlFile();
     }
 
     private CodeVertFile transformToJson() {
@@ -225,7 +220,7 @@ class JsonFile extends CodeVertFile {
         private CsvSchema generateSchemaFromFirstObject(JsonNode jsonArray) {
             CsvSchema.Builder schemaBuilder = CsvSchema.builder();
 
-            if (jsonArray.size() > 0 && jsonArray.get(0).isObject()) {
+            if (!jsonArray.isEmpty() && jsonArray.get(0).isObject()) {
                 JsonNode firstObject = jsonArray.get(0);
 
                 Iterator<Map.Entry<String, JsonNode>> fields = firstObject.fields();
