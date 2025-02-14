@@ -16,6 +16,6 @@ public class Main {
         file.getKeys().forEach(System.out::println);
         Set<FileExtension> compatibleExtensions = fileConverter.getCompatibleExtensions(file);
         compatibleExtensions.forEach(System.out::println);
-        fileConverter.convert(file, FileExtension.CSV, "popup");
+        fileConverter.convert(file, FileExtension.XML, "hobbies");
     }
 }

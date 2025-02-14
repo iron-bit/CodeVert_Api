@@ -1,11 +1,32 @@
-{"menu": {
-  "id": "file",
-  "value": "File",
-  "popup": {
-    "menuitem": [
-      {"value": "New", "onclick": "CreateDoc()"},
-      {"value": "Open", "onclick": "OpenDoc()"},
-      {"value": "Save", "onclick": "SaveDoc()"}
-    ]
-  }
-}}
+{
+  "name": "Alice",
+  "age": 28,
+  "isActive": true,
+  "contacts": [
+    {
+      "type": "email",
+      "value": "alice@example.com"
+    },
+    {
+      "type": "phone",
+      "value": "+123456789"
+    }
+  ],
+  "hobbies": ["Cycling", "Traveling"],
+  "address": {
+    "street": "456 Oak St",
+    "city": "Metropolis"
+  },
+  "projects": [
+    {
+      "name": "AppX",
+      "status": "completed",
+      "technologies": ["React", "Node.js"]
+    },
+    {
+      "name": "WebsiteY",
+      "status": "in progress",
+      "technologies": ["HTML", "CSS"]
+    }
+  ]
+}

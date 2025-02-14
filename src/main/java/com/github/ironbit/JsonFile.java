@@ -84,30 +84,26 @@ class JsonFile extends CodeVertFile {
 
     private void transformToXml(String jsonKey) {
         String jsonFilePath = this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
-        String xmlFilePath = this.filePath + this.fileName + "." + FileExtension.XML.toString().toLowerCase();
+        String xmlFilePath = this.findFileName(FileExtension.XML);
 
         System.out.println(xmlFilePath);
 
-        ObjectMapper jsonMapper = new ObjectMapper();   // For reading JSON
-        XmlMapper xmlMapper = new XmlMapper();           // For writing XML
+        ObjectMapper jsonMapper = new ObjectMapper();
+        XmlMapper xmlMapper = new XmlMapper();
 
         try {
             JsonNode rootNode = jsonMapper.readTree(new File(jsonFilePath));
+            JsonNode targetNode = extractTargetNode(jsonKey, rootNode);
 
-            if (jsonKey == null || jsonKey.isEmpty()) {
-                xmlMapper.writeValue(new File(xmlFilePath), rootNode);
-            } else {
-                JsonNode menuItemNode = rootNode.path("menu").path("popup").path(jsonKey);
-
-                if (menuItemNode.isMissingNode()) {
-                    xmlMapper.writeValue(new File(xmlFilePath), rootNode);
-                } else {
-                    ObjectNode rootWrapper = jsonMapper.createObjectNode();
-                    rootWrapper.set(jsonKey, menuItemNode);
-
-                    xmlMapper.writeValue(new File(xmlFilePath), rootWrapper);
-                }
+            // If the extracted node is NOT an object, wrap it in an object with its key name
+            JsonNode finalNode = targetNode;
+            if (!targetNode.isObject()) {
+                ObjectNode wrapper = jsonMapper.createObjectNode();
+                wrapper.set(jsonKey, targetNode);
+                finalNode = wrapper;
             }
+
+            xmlMapper.writeValue(new File(xmlFilePath), finalNode);
 
             System.out.println("JSON successfully converted to XML and saved as: " + xmlFilePath);
 
@@ -117,18 +113,71 @@ class JsonFile extends CodeVertFile {
         }
     }
 
+
+
+
+
+    private JsonNode wrapPrimitiveNode(ObjectMapper jsonMapper, String key, JsonNode valueNode) {
+        ObjectNode wrapper = jsonMapper.createObjectNode();
+        wrapper.put(key, valueNode.asText());  // Convert primitive value to text
+        return wrapper;
+    }
+
+
     private void transformToJson() {
     }
 
+
+    private JsonNode extractTargetNode(String jsonKey, JsonNode rootNode) {
+        if (jsonKey == null || jsonKey.isEmpty() || rootNode == null) {
+            return rootNode;
+        }
+
+        // Direct match at the root level
+        if (rootNode.has(jsonKey)) {
+            return rootNode.get(jsonKey);
+        }
+
+        // Recursive search in all fields and arrays
+        JsonNode foundNode = recursiveSearch(jsonKey, rootNode);
+        if (foundNode == null) {
+            System.err.println("Filtering key not found: " + jsonKey);
+        }
+        return foundNode;
+    }
+
+    private JsonNode recursiveSearch(String jsonKey, JsonNode node) {
+        if (node.isObject()) {
+            Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                if (field.getKey().equals(jsonKey)) {
+                    return field.getValue();
+                }
+                JsonNode result = recursiveSearch(jsonKey, field.getValue());
+                if (result != null) {
+                    return result;
+                }
+            }
+        } else if (node.isArray()) {
+            for (JsonNode arrayItem : node) {
+                JsonNode result = recursiveSearch(jsonKey, arrayItem);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;  // Key not found in this branch
+    }
 
     public static class JsonToCsvTransformer {
 
         private String filePath;
         private String fileName;
         private String fileExtension;
-        private CodeVertFile parent;
+        private JsonFile parent;
 
-        public JsonToCsvTransformer(String filePath, String fileName, String fileExtension, CodeVertFile parent) {
+        public JsonToCsvTransformer(String filePath, String fileName, String fileExtension, JsonFile parent) {
             this.filePath = filePath;
             this.fileName = fileName;
             this.fileExtension = fileExtension;
@@ -146,7 +195,7 @@ class JsonFile extends CodeVertFile {
                 // Read JSON input from file
                 JsonNode rootNode = jsonMapper.readTree(new File(jsonFilePath));
 
-                JsonNode targetNode = extractTargetNode(jsonKey, rootNode);
+                JsonNode targetNode = parent.extractTargetNode(jsonKey, rootNode);
 
                 if (targetNode.isObject()) {
                     writeObjectToCsv(csvMapper, targetNode, csvFilePath);
@@ -177,48 +226,6 @@ class JsonFile extends CodeVertFile {
             data.add(row);
 
             csvMapper.writer(schema).writeValue(new File(csvFilePath), data);
-        }
-
-        private JsonNode extractTargetNode(String jsonKey, JsonNode rootNode) {
-            if (jsonKey == null || jsonKey.isEmpty() || rootNode == null) {
-                return rootNode;
-            }
-
-            // Direct match at the root level
-            if (rootNode.has(jsonKey)) {
-                return rootNode.get(jsonKey);
-            }
-
-            // Recursive search in all fields and arrays
-            JsonNode foundNode = recursiveSearch(jsonKey, rootNode);
-            if (foundNode == null) {
-                System.err.println("Filtering key not found: " + jsonKey);
-            }
-            return foundNode;
-        }
-
-        private JsonNode recursiveSearch(String jsonKey, JsonNode node) {
-            if (node.isObject()) {
-                Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
-                while (fields.hasNext()) {
-                    Map.Entry<String, JsonNode> field = fields.next();
-                    if (field.getKey().equals(jsonKey)) {
-                        return field.getValue();
-                    }
-                    JsonNode result = recursiveSearch(jsonKey, field.getValue());
-                    if (result != null) {
-                        return result;
-                    }
-                }
-            } else if (node.isArray()) {
-                for (JsonNode arrayItem : node) {
-                    JsonNode result = recursiveSearch(jsonKey, arrayItem);
-                    if (result != null) {
-                        return result;
-                    }
-                }
-            }
-            return null;  // Key not found in this branch
         }
 
 
