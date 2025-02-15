@@ -8,5 +8,10 @@
     "CSV",
     "JSON",
     "TXT"
+  ],
+  "CSV": [
+    "JSON",
+    "XML",
+    "TXT"
   ]
 }

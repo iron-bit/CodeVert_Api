@@ -48,6 +48,7 @@ public class FileConverter {
         return switch (extension) {
             case JSON -> new JsonFile(file);
             case XML -> new XmlFile(file);
+            case CSV -> new CsvFile(file);
 //            case XML -> new XmlFile(file);
 //            case TXT -> new TxtFile(file);
             default -> throw new CodeVertException("Unsupported file extension.");
