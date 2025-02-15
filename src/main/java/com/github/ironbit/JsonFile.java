@@ -133,16 +133,6 @@ class JsonFile extends CodeVertFile {
     }
 
 
-
-
-
-    private JsonNode wrapPrimitiveNode(ObjectMapper jsonMapper, String key, JsonNode valueNode) {
-        ObjectNode wrapper = jsonMapper.createObjectNode();
-        wrapper.put(key, valueNode.asText());  // Convert primitive value to text
-        return wrapper;
-    }
-
-
     private void transformToJson() {
     }
 
@@ -189,7 +179,7 @@ class JsonFile extends CodeVertFile {
         return null;  // Key not found in this branch
     }
 
-    public static class JsonToCsvTransformer {
+    private static class JsonToCsvTransformer {
 
         private String filePath;
         private String fileName;

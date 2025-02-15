@@ -44,8 +44,10 @@ public class FileConverter {
     public CodeVertFile prepareFile(File file) {
         String strExtension = file.getName().substring(file.getName().lastIndexOf(".") + 1).toUpperCase();
         FileExtension extension = verifier.verifyExtension(strExtension);
+        System.out.println(extension);
         return switch (extension) {
             case JSON -> new JsonFile(file);
+            case XML -> new XmlFile(file);
 //            case XML -> new XmlFile(file);
 //            case TXT -> new TxtFile(file);
             default -> throw new CodeVertException("Unsupported file extension.");
