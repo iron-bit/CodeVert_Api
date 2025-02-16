@@ -1,6 +1,7 @@
 package com.github.ironbit;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -57,5 +58,11 @@ public class FileConverter {
 
     public Set<FileExtension> getCompatibleExtensions(CodeVertFile file) {
         return verifier.getCompatibilityArray(file);
+    }
+
+
+    public void convertMap(Map<String, Map<String, String>> map, FileExtension extension, String selectedKey) {
+        MapConverter converter = new MapConverter();
+        converter.convertMap(map, extension, selectedKey);
     }
 }
