@@ -2,6 +2,8 @@ package com.github.ironbit;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -106,8 +108,6 @@ class JsonFile extends CodeVertFile {
         String jsonFilePath = this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
         String xmlFilePath = this.findFileName(FileExtension.XML);
 
-        System.out.println(xmlFilePath);
-
         ObjectMapper jsonMapper = new ObjectMapper();
         XmlMapper xmlMapper = new XmlMapper();
 
@@ -115,15 +115,24 @@ class JsonFile extends CodeVertFile {
             JsonNode rootNode = jsonMapper.readTree(new File(jsonFilePath));
             JsonNode targetNode = extractTargetNode(jsonKey, rootNode);
 
-            // If the extracted node is NOT an object, wrap it in an object with its key name
-            JsonNode finalNode = targetNode;
-            if (!targetNode.isObject()) {
-                ObjectNode wrapper = jsonMapper.createObjectNode();
-                wrapper.set(jsonKey, targetNode);
-                finalNode = wrapper;
+            if (targetNode == null) {
+                System.err.println("Error: Key '" + jsonKey + "' not found in JSON.");
+                return "";
             }
 
-            xmlMapper.writeValue(new File(xmlFilePath), finalNode);
+            // Wrap root-level arrays to avoid QName issues
+            if (targetNode.isArray()) {
+                ObjectNode wrapper = jsonMapper.createObjectNode();
+                wrapper.set("root", targetNode);
+                targetNode = wrapper;
+            }
+
+            // Remove empty fields
+            targetNode = removeEmptyFields(targetNode);
+
+            // Write the XML output
+            xmlMapper.enable(SerializationFeature.WRAP_ROOT_VALUE); // Helps prevent QName errors
+            xmlMapper.writeValue(new File(xmlFilePath), targetNode);
 
             System.out.println("JSON successfully converted to XML and saved as: " + xmlFilePath);
 
@@ -133,6 +142,37 @@ class JsonFile extends CodeVertFile {
         }
         return xmlFilePath;
     }
+
+    /**
+     * Removes empty or null fields from JSON before converting to XML.
+     */
+    private JsonNode removeEmptyFields(JsonNode node) {
+        if (node.isObject()) {
+            ObjectNode cleanedNode = ((ObjectNode) node).deepCopy();
+            Iterator<Map.Entry<String, JsonNode>> fields = cleanedNode.fields();
+
+            List<String> emptyKeys = new ArrayList<>();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> entry = fields.next();
+                if (entry.getValue().isNull() || (entry.getValue().isTextual() && entry.getValue().asText().isEmpty())) {
+                    emptyKeys.add(entry.getKey());
+                } else {
+                    cleanedNode.set(entry.getKey(), removeEmptyFields(entry.getValue()));
+                }
+            }
+
+            emptyKeys.forEach(cleanedNode::remove);
+            return cleanedNode;
+        } else if (node.isArray()) {
+            ArrayNode cleanedArray = ((ArrayNode) node).deepCopy();
+            for (int i = 0; i < cleanedArray.size(); i++) {
+                cleanedArray.set(i, removeEmptyFields(cleanedArray.get(i)));
+            }
+            return cleanedArray;
+        }
+        return node;
+    }
+
 
 
     private String transformToJson() {
