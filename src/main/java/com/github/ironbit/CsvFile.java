@@ -41,20 +41,21 @@ class CsvFile extends CodeVertFile {
     }
 
     @Override
-    void convertTo(FileExtension fileExtension, String selectedKey) {
+    String convertTo(FileExtension fileExtension, String selectedKey) {
         try {
-            switch (fileExtension) {
+            return switch (fileExtension) {
                 case CSV -> transformToCsv();
                 case JSON -> transformToJson(selectedKey);
                 case XML -> transformToXml(selectedKey);
                 case TXT -> transformToTxt(selectedKey);
-            }
+            };
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return "";
     }
 
-    private void transformToTxt(String selectedKey) {
+    private String transformToTxt(String selectedKey) {
         String csvFilePath = this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
         String txtFilePath = this.findFileName(FileExtension.TXT);
 
@@ -110,15 +111,18 @@ class CsvFile extends CodeVertFile {
             e.printStackTrace();
             System.err.println("Error during conversion: " + e.getMessage());
         }
+        return txtFilePath;
     }
 
 
-    private void transformToCsv() {
-        // No transformation needed if the target is the same format
+    private String transformToCsv() {
+        return "";
     }
 
-    private void transformToJson(String selectedKey) throws IOException {
+    private String transformToJson(String selectedKey) throws IOException {
         String csvFilePath = this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
+        String jsonFilePath = this.findFileName(FileExtension.JSON);
+
         BufferedReader br = new BufferedReader(new FileReader(csvFilePath));
         String line = br.readLine(); // Read the header row
         String[] headers = line.split(","); // Change delimiter to comma
@@ -146,12 +150,12 @@ class CsvFile extends CodeVertFile {
             arrayNode.add(objectNode);
         }
 
-        String jsonFilePath = this.findFileName(FileExtension.JSON);
         objectMapper.writeValue(new File(jsonFilePath), arrayNode);
         br.close();
+        return jsonFilePath;
     }
 
-    private void transformToXml(String selectedKey) {
+    private String transformToXml(String selectedKey) {
         String csvFilePath = this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
         String xmlFilePath = this.findFileName(FileExtension.XML);
 
@@ -211,6 +215,7 @@ class CsvFile extends CodeVertFile {
             e.printStackTrace();
             System.err.println("Error during conversion: " + e.getMessage());
         }
+        return xmlFilePath;
     }
 
 

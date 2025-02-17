@@ -16,20 +16,20 @@ class TxtFile extends CodeVertFile {
     }
 
     @Override
-    void convertTo(FileExtension fileExtension, String selectedKey) {
-        switch (fileExtension) {
+    String convertTo(FileExtension fileExtension, String selectedKey) {
+        return switch (fileExtension) {
             case JSON -> transformToJson();
             case TXT -> transformToTxt();//No funcionan
             case CSV -> transformToCsv();
             case XML -> transformToXml();
-        }
+        };
     }
 
-    private void transformToTxt() {}
+    private String transformToTxt() {return "";}
 
-    private void transformToCsv() {}
+    private String transformToCsv() {return "";}
 
-    private void transformToXml() {}
+    private String transformToXml() {return "";}
 
-    private void transformToJson() {}
+    private String transformToJson() {return "";}
 }

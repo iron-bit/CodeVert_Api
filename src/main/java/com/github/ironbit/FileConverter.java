@@ -24,17 +24,15 @@ public class FileConverter {
      * @param file1 the file to be converted
      * @param extension2 the target file extension
      */
-    public void convert(CodeVertFile file1, FileExtension extension2, String selectedKey) {
+    public String convert(CodeVertFile file1, FileExtension extension2, String selectedKey) {
         boolean isCompatible = verifier.verifyExtensionCompatibility(file1.getFileExtension(), extension2);
-
+        String extension = null;
         if (isCompatible) {
-            file1.convertTo(extension2, selectedKey);
-//            file2.saveFile();
-//            System.out.println("File converted to " + extension2.name() + " successfully.");
-//            System.out.println("File saved in " + file2.getFilePath());
+            extension = file1.convertTo(extension2, selectedKey);
         } else {
-//            System.out.println("File extension not compatible.");
+            System.out.println("File extension not compatible.");
         }
+        return extension;
     }
     /**
      * Prepares a CodeVertFile instance from the given file based on its extension.

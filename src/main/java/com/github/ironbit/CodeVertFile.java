@@ -34,7 +34,7 @@ public abstract class CodeVertFile {
      * @param fileExtension The fileExtension type to convert to.
      * @param selectedKey   The key used for filtering.
      */
-    abstract void convertTo(FileExtension fileExtension, String selectedKey);
+    abstract String convertTo(FileExtension fileExtension, String selectedKey);
 
 
     /**

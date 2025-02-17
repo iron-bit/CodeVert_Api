@@ -44,16 +44,16 @@ class XmlFile extends CodeVertFile {
     }
 
     @Override
-    void convertTo(FileExtension fileExtension, String selectedKey) {
-        switch (fileExtension) {
+    String convertTo(FileExtension fileExtension, String selectedKey) {
+        return switch (fileExtension) {
             case XML -> transformToXml();
             case JSON -> transformToJson(selectedKey);
             case CSV -> transformToCsv(selectedKey);
             case TXT -> transformToTxt(selectedKey);
-        }
+        };
     }
 
-    private void transformToTxt(String selectedKey) {
+    private String transformToTxt(String selectedKey) {
         String xmlFilePath = this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
         String txtFilePath = this.findFileName(FileExtension.TXT);
 
@@ -76,6 +76,7 @@ class XmlFile extends CodeVertFile {
             e.printStackTrace();
             System.err.println("Error during conversion: " + e.getMessage());
         }
+        return txtFilePath;
     }
 
     private void convertJsonNodeToTxt(JsonNode node, StringBuilder txtContent, String indent) {
@@ -93,12 +94,12 @@ class XmlFile extends CodeVertFile {
         }
     }
 
-    private void transformToCsv(String xmlKey) {
+    private String transformToCsv(String xmlKey) {
         XmlToCsvTransformer xmlToCsvTransformer = new XmlToCsvTransformer(this.filePath, this.fileName, this.fileExtension.toString(), this);
-        xmlToCsvTransformer.transformToCsv(xmlKey);
+        return xmlToCsvTransformer.transformToCsv(xmlKey);
     }
 
-    private void transformToJson(String xmlKey) {
+    private String transformToJson(String xmlKey) {
         String xmlFilePath = this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
         String jsonFilePath = this.findFileName(FileExtension.JSON);
 
@@ -117,9 +118,11 @@ class XmlFile extends CodeVertFile {
             e.printStackTrace();
             System.err.println("Error during conversion: " + e.getMessage());
         }
+        return jsonFilePath;
     }
 
-    private void transformToXml() {
+    private String transformToXml() {
+        return "";
     }
 
     private JsonNode extractTargetNode(String xmlKey, JsonNode rootNode) {
@@ -176,7 +179,7 @@ class XmlFile extends CodeVertFile {
             this.parent = parent;
         }
 
-        public void transformToCsv(String xmlKey) {
+        public String transformToCsv(String xmlKey) {
             String xmlFilePath = parent.getFullFilePath();
             String csvFilePath = parent.findFileName(FileExtension.CSV);
 
@@ -191,7 +194,7 @@ class XmlFile extends CodeVertFile {
                 JsonNode targetNode = parent.extractTargetNode(xmlKey, rootNode);
                 if (targetNode == null) {
                     System.err.println("Key not found in XML: " + xmlKey);
-                    return;
+                    return "";
                 }
 
                 // Flatten the extracted JSON structure
@@ -218,6 +221,7 @@ class XmlFile extends CodeVertFile {
                 e.printStackTrace();
                 System.err.println("Error during XML to CSV conversion: " + e.getMessage());
             }
+            return csvFilePath;
         }
 
 
