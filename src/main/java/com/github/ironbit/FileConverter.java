@@ -59,8 +59,8 @@ public class FileConverter {
     }
 
 
-    public void convertMap(Map<String, Map<String, String>> map, FileExtension extension, String selectedKey) {
+    public String convertMap(Map<String, Map<String, String>> map, FileExtension extension, String selectedKey) {
         MapConverter converter = new MapConverter();
-        converter.convertMap(map, extension, selectedKey);
+        return converter.convertMap(map, extension, selectedKey);
     }
 }

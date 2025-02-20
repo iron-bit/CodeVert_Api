@@ -1,0 +1,40 @@
+Index:  1
+"Mass (kg)":  0.00
+"Spring 1 (m)":  0.050
+"Spring 2 (m)":  0.050
+Index:  2
+"Mass (kg)":  0.49
+"Spring 1 (m)":  0.066
+"Spring 2 (m)":  0.066
+Index:  3
+"Mass (kg)":  0.98
+"Spring 1 (m)":  0.087
+"Spring 2 (m)":  0.080
+Index:  4
+"Mass (kg)":  1.47
+"Spring 1 (m)":  0.116
+"Spring 2 (m)":  0.108
+Index:  5
+"Mass (kg)":  1.96
+"Spring 1 (m)":  0.142
+"Spring 2 (m)":  0.138
+Index:  6
+"Mass (kg)":  2.45
+"Spring 1 (m)":  0.166
+"Spring 2 (m)":  0.158
+Index:  7
+"Mass (kg)":  2.94
+"Spring 1 (m)":  0.193
+"Spring 2 (m)":  0.174
+Index:  8
+"Mass (kg)":  3.43
+"Spring 1 (m)":  0.204
+"Spring 2 (m)":  0.192
+Index:  9
+"Mass (kg)":  3.92
+"Spring 1 (m)":  0.226
+"Spring 2 (m)":  0.205
+Index: 10
+"Mass (kg)":  4.41
+"Spring 1 (m)":  0.238
+"Spring 2 (m)":  0.232

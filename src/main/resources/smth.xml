@@ -1,0 +1,31 @@
+<ObjectNode>
+    <name>Alice</name>
+    <age>28</age>
+    <isActive>true</isActive>
+    <contacts>
+        <type>email</type>
+        <value>alice@example.com</value>
+    </contacts>
+    <contacts>
+        <type>phone</type>
+        <value>+123456789</value>
+    </contacts>
+    <hobbies>Cycling</hobbies>
+    <hobbies>Traveling</hobbies>
+    <address>
+        <street>456 Oak St</street>
+        <city>Metropolis</city>
+    </address>
+    <projects>
+        <name>AppX</name>
+        <status>completed</status>
+        <technologies>React</technologies>
+        <technologies>Node.js</technologies>
+    </projects>
+    <projects>
+        <name>WebsiteY</name>
+        <status>in progress</status>
+        <technologies>HTML</technologies>
+        <technologies>CSS</technologies>
+    </projects>
+</ObjectNode>

@@ -294,6 +294,27 @@ class JsonFile extends CodeVertFile {
             csvMapper.writer(schema).writeValue(new File(csvFilePath), Collections.singletonList(flatJson));
         }
 
+        private void writeArrayToCsv(CsvMapper csvMapper, JsonNode jsonArray, String csvFilePath) throws IOException {
+            List<Map<String, String>> flattenedData = new ArrayList<>();
+            for (JsonNode jsonNode : jsonArray) {
+                flattenedData.add(flattenJson(jsonNode));
+            }
+
+            CsvSchema schema = generateSchemaFromFlattenedData(flattenedData).withoutQuoteChar().withColumnSeparator(';');
+            csvMapper.writer(schema).writeValue(new File(csvFilePath), flattenedData);
+        }
+
+
+        private CsvSchema generateSchemaFromFlattenedData(List<Map<String, String>> flattenedData) {
+            CsvSchema.Builder schemaBuilder = CsvSchema.builder();
+            if (!flattenedData.isEmpty()) {
+                for (String key : flattenedData.get(0).keySet()) {
+                    schemaBuilder.addColumn(key);
+                }
+            }
+            return schemaBuilder.build().withHeader();
+        }
+
         private Map<String, String> flattenJson(JsonNode jsonNode) {
             Map<String, String> flatJson = new LinkedHashMap<>();
             flattenJsonHelper(jsonNode, flatJson, "");
@@ -314,24 +335,6 @@ class JsonFile extends CodeVertFile {
             } else {
                 flatJson.put(prefix, jsonNode.asText());
             }
-        }
-
-        private void writeArrayToCsv(CsvMapper csvMapper, JsonNode jsonArray, String csvFilePath) throws IOException {
-            CsvSchema schema = generateSchemaFromFirstObject(jsonArray).withoutQuoteChar().withColumnSeparator(';');
-            csvMapper.writer(schema).writeValue(new File(csvFilePath), jsonArray);
-        }
-
-        private CsvSchema generateSchemaFromFirstObject(JsonNode jsonArray) {
-            CsvSchema.Builder schemaBuilder = CsvSchema.builder();
-
-            if (!jsonArray.isEmpty() && jsonArray.get(0).isObject()) {
-                JsonNode firstObject = jsonArray.get(0);
-                Iterator<Map.Entry<String, JsonNode>> fields = firstObject.fields();
-                while (fields.hasNext()) {
-                    schemaBuilder.addColumn(fields.next().getKey());
-                }
-            }
-            return schemaBuilder.build().withHeader();
         }
     }
 }
