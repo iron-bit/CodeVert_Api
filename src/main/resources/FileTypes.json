@@ -14,5 +14,10 @@
     "JSON",
     "XML",
     "TXT"
+  ],
+  "TXT": [
+    "JSON",
+    "CSV",
+    "XML"
   ]
 }

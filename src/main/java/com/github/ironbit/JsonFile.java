@@ -87,15 +87,24 @@ class JsonFile extends CodeVertFile {
     private void convertJsonNodeToTxt(JsonNode node, StringBuilder txtContent, String indent) {
         if (node.isObject()) {
             node.fields().forEachRemaining(field -> {
-                txtContent.append(indent).append(field.getKey()).append(": ");
-                convertJsonNodeToTxt(field.getValue(), txtContent, indent + "  ");
+                txtContent.append(indent).append(field.getKey()).append(":");
+                JsonNode value = field.getValue();
+                if (value.isObject() || value.isArray()) {
+                    txtContent.append("\n");
+                } else {
+                    txtContent.append(" ").append(value.asText()).append("\n");
+                }
+                convertJsonNodeToTxt(value, txtContent, indent + "  ");
             });
         } else if (node.isArray()) {
-            node.forEach(element -> {
-                convertJsonNodeToTxt(element, txtContent, indent + "- ");
-            });
-        } else {
-            txtContent.append(node.asText()).append("\n");
+            for (JsonNode element : node) {
+                if (element.isObject() || element.isArray()) {
+                    txtContent.append(indent).append("-\n");
+                    convertJsonNodeToTxt(element, txtContent, indent + "  ");
+                } else {
+                    txtContent.append(indent).append("- ").append(element.asText()).append("\n");
+                }
+            }
         }
     }
 

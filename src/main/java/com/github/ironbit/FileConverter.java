@@ -49,7 +49,7 @@ public class FileConverter {
             case JSON -> new JsonFile(file);
             case XML -> new XmlFile(file);
             case CSV -> new CsvFile(file);
-//            case TXT -> new TxtFile(file);
+            case TXT -> new TxtFile(file);
             default -> throw new CodeVertException("Unsupported file extension.");
         };
     }

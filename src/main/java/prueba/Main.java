@@ -10,12 +10,11 @@ import java.util.Set;
 public class Main {
     public static void main(String[] args) {
         //Creamos el objeto al ejecutar el evento de Drag and Drop
-        File userFile = new File("/home/tymur/Documents/CodeVertApi/src/main/resources/smth.xml");
+        File userFile = new File("/home/tymur/Documents/CodeVertApi/src/main/resources/aaaa.txt");
         FileConverter fileConverter = new FileConverter();
         CodeVertFile file = fileConverter.prepareFile(userFile);
-        Set<FileExtension> compatibleExtensions = fileConverter.getCompatibleExtensions(file);
-        compatibleExtensions.forEach(System.out::println);
-        String result = fileConverter.convert(file, FileExtension.CSV, "contacts");
+        file.getKeys().forEach(System.out::println);
+        String result = fileConverter.convert(file, FileExtension.XML, "projects");
         System.out.println(result);
     }
 }
