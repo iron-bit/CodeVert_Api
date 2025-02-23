@@ -13,15 +13,6 @@ import java.io.*;
 import java.util.*;
 
 class JsonFile extends CodeVertFile {
-
-    public JsonFile() {
-        super("JsonFile", FileExtension.JSON, "JsonFile path");
-    }
-
-    public JsonFile(String fileName, String fileContent, String filePath) {
-        super(fileName, FileExtension.JSON, filePath);
-    }
-
     public JsonFile(File userFile) {
         super(userFile);
         this.keys = new ArrayList<>();
@@ -33,7 +24,6 @@ class JsonFile extends CodeVertFile {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        this.keys.forEach(System.out::println);
     }
 
     private void collectKeys(JsonNode node, ArrayList<String> keys) {

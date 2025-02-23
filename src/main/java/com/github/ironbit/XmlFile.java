@@ -10,15 +10,6 @@ import java.io.*;
 import java.util.*;
 
 class XmlFile extends CodeVertFile {
-
-    public XmlFile() {
-        super("XmlFile", FileExtension.XML, "XmlFile path");
-    }
-
-    public XmlFile(String fileName, String fileContent, String filePath) {
-        super(fileName, FileExtension.XML, filePath);
-    }
-
     public XmlFile(File userFile) {
         super(userFile);
         this.keys = new ArrayList<>();
