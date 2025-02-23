@@ -41,7 +41,7 @@ class JsonFile extends CodeVertFile {
     @Override
     String convertTo(FileExtension fileExtension, String selectedKey) {
         return switch (fileExtension) {
-            case JSON -> transformToJson();
+            case JSON -> transformToJson(selectedKey);
             case XML -> transformToXml(selectedKey);
             case CSV -> transformToCsv(selectedKey);
             case TXT -> transformToTxt(selectedKey);
@@ -172,8 +172,45 @@ class JsonFile extends CodeVertFile {
     }
 
 
-    private String transformToJson() {
-        return "";
+    private String transformToJson(String jsonKey) {
+        String jsonFilePath = this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
+        String jsonOutputPath = this.findFileName(FileExtension.JSON); // Assuming you want to output JSON file
+
+        ObjectMapper jsonMapper = new ObjectMapper();
+
+        try {
+            // Read the JSON from the file
+            JsonNode rootNode = jsonMapper.readTree(new File(jsonFilePath));
+
+            // Extract the node based on the provided key
+            JsonNode targetNode = extractTargetNode(jsonKey, rootNode);
+
+            if (targetNode == null) {
+                System.err.println("Error: Key '" + jsonKey + "' not found in JSON.");
+                return "";
+            }
+
+            // If the target node is an array, wrap it in a parent object
+            if (targetNode.isArray()) {
+                ObjectNode wrapper = jsonMapper.createObjectNode();
+                wrapper.set("record", targetNode);
+                targetNode = wrapper;
+            }
+
+            // Remove empty fields if needed
+            targetNode = removeEmptyFields(targetNode);
+
+            // Write the filtered JSON to the output file
+            jsonMapper.writerWithDefaultPrettyPrinter().writeValue(new File(jsonOutputPath), targetNode);
+
+            System.out.println("Filtered JSON successfully saved as: " + jsonOutputPath);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error during conversion: " + e.getMessage());
+        }
+        return jsonOutputPath;
+
     }
 
 
