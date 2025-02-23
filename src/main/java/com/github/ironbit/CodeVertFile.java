@@ -12,12 +12,11 @@ public abstract class CodeVertFile {
     protected ArrayList<String> keys;
     protected String filePath;
 
-    public CodeVertFile(String fileName, FileExtension fileExtension, String filePath) {
-        this.fileName = fileName;
-        this.fileExtension = fileExtension;
-        this.filePath = filePath;
-    }
-
+    /**
+     * Constructs a CodeVertFile instance from a File object.
+     *
+     * @param f the File object
+     */
     public CodeVertFile(File f) {
         this.fileName = f.getName().substring(0, f.getName().lastIndexOf("."));
         String ext = (f.getName().substring(f.getName().lastIndexOf(".") + 1)).toUpperCase();
@@ -29,10 +28,11 @@ public abstract class CodeVertFile {
     }
 
     /**
-     * Converts the fileExtension to another fileExtension type.
+     * Converts the file to another file extension type.
      *
-     * @param fileExtension The fileExtension type to convert to.
-     * @param selectedKey   The key used for filtering.
+     * @param fileExtension the target file extension
+     * @param selectedKey   the key used for filtering
+     * @return the path to the converted file
      */
     abstract String convertTo(FileExtension fileExtension, String selectedKey);
 
@@ -40,7 +40,8 @@ public abstract class CodeVertFile {
     /**
      * Finds a file name that does not exist in the specified path.
      *
-     * @return A String with a name that does not exist in the specified path.
+     * @param fileExtension the target file extension
+     * @return a unique file name that does not exist in the specified path
      */
     protected String findFileName(FileExtension fileExtension) {
         File f = new File(this.filePath + this.fileName + "." + fileExtension.toString().toLowerCase());

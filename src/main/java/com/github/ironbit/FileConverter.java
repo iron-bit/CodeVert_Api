@@ -21,8 +21,10 @@ public class FileConverter {
     /**
      * Converts the given file to the specified extension if they are compatible.
      *
-     * @param file1      the file to be converted
-     * @param extension2 the target file extension
+     * @param file1        the file to be converted
+     * @param extension2   the target file extension
+     * @param selectedKey  the key used for filtering during conversion
+     * @return the path to the converted file, or null if the conversion is not compatible
      */
     public String convert(CodeVertFile file1, FileExtension extension2, String selectedKey) {
         boolean isCompatible = verifier.verifyExtensionCompatibility(file1.getFileExtension(), extension2);
@@ -40,6 +42,7 @@ public class FileConverter {
      *
      * @param file the file to be prepared
      * @return the corresponding CodeVertFile instance, or null if the extension is not supported
+     * @throws CodeVertException if the file extension is unsupported
      */
     public CodeVertFile prepareFile(File file) {
         String strExtension = file.getName().substring(file.getName().lastIndexOf(".") + 1).toUpperCase();
@@ -54,11 +57,24 @@ public class FileConverter {
         };
     }
 
+    /**
+     * Retrieves the set of compatible file extensions for the given file.
+     *
+     * @param file the file for which to retrieve compatible extensions
+     * @return a set of compatible file extensions
+     */
     public Set<FileExtension> getCompatibleExtensions(CodeVertFile file) {
         return verifier.getCompatibilityArray(file);
     }
 
-
+    /**
+     * Converts a map to the specified file extension format.
+     *
+     * @param map          the map to be converted
+     * @param extension    the target file extension
+     * @param selectedKey  the key used for filtering during conversion
+     * @return the path to the converted file
+     */
     public String convertMap(Map<String, Map<String, String>> map, FileExtension extension, String selectedKey) {
         MapConverter converter = new MapConverter();
         return converter.convertMap(map, extension, selectedKey);
