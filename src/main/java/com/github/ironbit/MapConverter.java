@@ -8,7 +8,7 @@ import java.util.*;
 class MapConverter {
     private static final String RESULT_PATH = "";
 
-    private final ObjectMapper objectMapper = new ObjectMapper(); // Jackson ObjectMapper
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public String convertMap(Map<String, Map<String, String>> map, FileExtension extension, String selectedKey) {
         if (map == null || map.isEmpty()) {
@@ -120,16 +120,31 @@ class MapConverter {
     }
 
     private String convertAllToTxt(Map<String, Map<String, String>> map) {
-        StringBuilder txt = new StringBuilder();
+        String directoryPath = "OutputFiles" + File.separator + "TXT" + File.separator;
+        File dir = new File(directoryPath);
+        if (!dir.exists()) dir.mkdirs(); // Ensure directory exists
+
+        String filePath = "";
         for (var tableEntry : map.entrySet()) {
-            txt.append("TABLE: ").append(tableEntry.getKey()).append("\n");
-            for (var row : transformTable(tableEntry.getValue())) {
-                row.forEach((key, value) -> txt.append(key).append(": ").append(value).append("\n"));
-                txt.append("\n");
+            filePath = directoryPath + tableEntry.getKey() + ".txt";
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+                for (var row : transformTable(tableEntry.getValue())) {
+                    row.forEach((key, value) -> {
+                        try {
+                            writer.write(key + ": " + value + "\n");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    writer.write("\n");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        return saveToFile(FileExtension.TXT, txt.toString());
+        return filePath; // Return the last file path
     }
+
 
     private String convertToTxt(Map<String, String> tableData) {
         StringBuilder txt = new StringBuilder();
@@ -141,18 +156,22 @@ class MapConverter {
     }
 
     private String convertAllToCsv(Map<String, Map<String, String>> map) {
-        String fileName = findFileName(FileExtension.CSV);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            for (var tableEntry : map.entrySet()) {
-                writer.write("TABLE: " + tableEntry.getKey() + "\n");
+        String directoryPath = "OutputFiles" + File.separator + "CSV" + File.separator;
+        File dir = new File(directoryPath);
+        if (!dir.exists()) dir.mkdirs(); // Ensure directory exists
+
+        String filePath = "";
+        for (var tableEntry : map.entrySet()) {
+            filePath = directoryPath + tableEntry.getKey() + ".csv";
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
                 writeCsv(writer, tableEntry.getValue());
-                writer.write("\n");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        return fileName;
+        return filePath; // Return the last file path
     }
+
 
     private String convertToCsv(Map<String, String> tableData) {
         String fileName = findFileName(FileExtension.CSV);
@@ -184,25 +203,25 @@ class MapConverter {
         return filename;
     }
 
-    public static void main(String[] args) {
-        MapConverter converter = new MapConverter();
-
-        Map<String, Map<String, String>> mockData = Map.of(
-                "users", Map.of(
-                        "HEADER", "id,name,email",
-                        "1", "1,John Doe,john@example.com",
-                        "2", "2,Jane Doe,jane@example.com"
-                ),
-                "orders", Map.of(
-                        "HEADER", "order_id,user_id,total",
-                        "1", "101,1,250.00",
-                        "2", "102,2,199.99"
-                )
-        );
-
-        converter.convertMap(mockData, FileExtension.CSV, null);
-
-    }
+//    public static void main(String[] args) {
+//        MapConverter converter = new MapConverter();
+//
+//        Map<String, Map<String, String>> mockData = Map.of(
+//                "users", Map.of(
+//                        "HEADER", "id,name,email",
+//                        "1", "1,John Doe,john@example.com",
+//                        "2", "2,Jane Doe,jane@example.com"
+//                ),
+//                "orders", Map.of(
+//                        "HEADER", "order_id,user_id,total",
+//                        "1", "101,1,250.00",
+//                        "2", "102,2,199.99"
+//                )
+//        );
+//
+//        System.out.println(converter.convertMap(mockData, FileExtension.TXT, null));
+//
+//    }
 
     private String findFileName(FileExtension fileExtension) {
         File f = new File(MapConverter.RESULT_PATH + "CodevertResult" + "." + fileExtension.toString().toLowerCase());

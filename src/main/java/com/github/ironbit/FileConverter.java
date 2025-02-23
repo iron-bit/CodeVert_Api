@@ -21,7 +21,7 @@ public class FileConverter {
     /**
      * Converts the given file to the specified extension if they are compatible.
      *
-     * @param file1 the file to be converted
+     * @param file1      the file to be converted
      * @param extension2 the target file extension
      */
     public String convert(CodeVertFile file1, FileExtension extension2, String selectedKey) {
@@ -34,6 +34,7 @@ public class FileConverter {
         }
         return extension;
     }
+
     /**
      * Prepares a CodeVertFile instance from the given file based on its extension.
      *
@@ -48,7 +49,6 @@ public class FileConverter {
             case JSON -> new JsonFile(file);
             case XML -> new XmlFile(file);
             case CSV -> new CsvFile(file);
-//            case XML -> new XmlFile(file);
 //            case TXT -> new TxtFile(file);
             default -> throw new CodeVertException("Unsupported file extension.");
         };

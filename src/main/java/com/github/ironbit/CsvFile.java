@@ -15,15 +15,14 @@ import java.util.*;
 
 class CsvFile extends CodeVertFile {
 
-    public CsvFile(String fileName, String fileContent, String filePath) {
-        super(fileName, FileExtension.CSV, filePath);
-    }
+    private final char delimiter;
 
     public CsvFile(File userFile) {
         super(userFile);
         this.keys = new ArrayList<>();
+        this.delimiter = detectDelimiter(userFile);
         CsvMapper csvMapper = new CsvMapper();
-        CsvSchema schema = CsvSchema.emptySchema().withHeader();
+        CsvSchema schema = CsvSchema.emptySchema().withHeader().withColumnSeparator(this.delimiter);
 
         try {
             MappingIterator<Map<String, String>> it = csvMapper.readerFor(Map.class)
@@ -35,9 +34,27 @@ class CsvFile extends CodeVertFile {
                 this.keys.addAll(firstRow.keySet());
             }
 
+            this.keys.forEach(System.out::print);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private char detectDelimiter(File file) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line = br.readLine();
+            if (line != null) {
+                if (line.contains(";")) {
+                    return ';';
+                } else if (line.contains(",")) {
+                    return ',';
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ';'; // Default to semicolon if no delimiter is detected
     }
 
     @Override
@@ -55,12 +72,16 @@ class CsvFile extends CodeVertFile {
         return "";
     }
 
+    private String transformToCsv() {
+        return "";
+    }
+
     private String transformToTxt(String selectedKey) {
         String csvFilePath = this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
         String txtFilePath = this.findFileName(FileExtension.TXT);
 
         CsvMapper csvMapper = new CsvMapper();
-        CsvSchema schema = CsvSchema.emptySchema().withHeader(); // Ensure headers are included
+        CsvSchema schema = CsvSchema.emptySchema().withHeader();
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
             String headerLine = br.readLine();
@@ -68,39 +89,30 @@ class CsvFile extends CodeVertFile {
                 throw new IOException("CSV file is empty or missing header row");
             }
 
-            // MappingIterator to read all rows
+            String[] headers = headerLine.split(delimiter + "");
+
             MappingIterator<Map<String, String>> it = csvMapper.readerFor(Map.class)
                     .with(schema)
                     .readValues(new File(csvFilePath));
 
-            // Prepare the StringBuilder for text output
             StringBuilder txtContent = new StringBuilder();
-
-            // Read and track the row index (1-based) and transform based on selectedKey
-            int currentIndex = 1; // Starting from 1 to match the selectedKey index
 
             while (it.hasNext()) {
                 Map<String, String> row = it.next();
-                if (row.isEmpty()) continue;  // Skip empty rows
+                if (row.isEmpty()) continue;
 
-                // Check if we should process this row based on selectedKey
-                if (selectedKey == null || Integer.parseInt(selectedKey) == currentIndex) {
-                    row.forEach((key, value) -> {
-                        // Write each key-value pair to the text output
-                        txtContent.append(key).append(": ").append(value).append("\n");
-                    });
-                    // Add a separator between rows (optional, you can customize the separator)
-                    txtContent.append("\n");
+                if (selectedKey == null) {
+                    row.forEach((key, value) -> txtContent.append(key).append(": ").append(value).append("\n"));
+                } else if (row.containsKey(selectedKey)) {
+                    txtContent.append(selectedKey).append(": ").append(row.get(selectedKey)).append("\n");
                 }
-
-                currentIndex++; // Increment index for next row
+                txtContent.append("\n");
             }
 
             if (txtContent.length() == 0) {
                 throw new IOException("No data found matching the criteria.");
             }
 
-            // Write the generated text content to the file
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(txtFilePath))) {
                 writer.write(txtContent.toString());
             }
@@ -114,43 +126,30 @@ class CsvFile extends CodeVertFile {
         return txtFilePath;
     }
 
-
-    private String transformToCsv() {
-        return "";
-    }
-
     private String transformToJson(String selectedKey) throws IOException {
         String csvFilePath = this.filePath + this.fileName + "." + this.fileExtension.toString().toLowerCase();
         String jsonFilePath = this.findFileName(FileExtension.JSON);
 
         BufferedReader br = new BufferedReader(new FileReader(csvFilePath));
-        String line = br.readLine(); // Read the header row
-        String[] headers = line.split(","); // Change delimiter to comma
+        String line = br.readLine();
+        String[] headers = line.split(delimiter + "");
 
         List<Map<String, String>> data = new ArrayList<>();
         while ((line = br.readLine()) != null) {
-            String[] values = line.split(",");
+            String[] values = line.split(delimiter + "");
             Map<String, String> row = new LinkedHashMap<>();
             for (int i = 0; i < headers.length; i++) {
                 row.put(headers[i].trim(), values[i].trim());
             }
-            if (selectedKey == null || row.get(headers[0]).equals(selectedKey)) {
+            if (selectedKey == null) {
                 data.add(row);
+            } else if (row.containsKey(selectedKey)) {
+                data.add(Collections.singletonMap(selectedKey, row.get(selectedKey)));
             }
         }
 
-        // Create ObjectMapper instance
         ObjectMapper objectMapper = new ObjectMapper();
-
-        // Convert list of maps to JSON
-        ArrayNode arrayNode = objectMapper.createArrayNode();
-        for (Map<String, String> row : data) {
-            ObjectNode objectNode = objectMapper.createObjectNode();
-            row.forEach(objectNode::put);
-            arrayNode.add(objectNode);
-        }
-
-        objectMapper.writeValue(new File(jsonFilePath), arrayNode);
+        objectMapper.writeValue(new File(jsonFilePath), data);
         br.close();
         return jsonFilePath;
     }
@@ -160,7 +159,7 @@ class CsvFile extends CodeVertFile {
         String xmlFilePath = this.findFileName(FileExtension.XML);
 
         CsvMapper csvMapper = new CsvMapper();
-        CsvSchema schema = CsvSchema.emptySchema().withHeader(); // Ensure headers are included
+        CsvSchema schema = CsvSchema.emptySchema().withHeader();
         ObjectMapper jsonMapper = new ObjectMapper();
         XmlMapper xmlMapper = new XmlMapper();
 
@@ -170,43 +169,38 @@ class CsvFile extends CodeVertFile {
                 throw new IOException("CSV file is empty or missing header row");
             }
 
-            // MappingIterator to read all rows
+            String[] headers = headerLine.split(delimiter + "");
+
             MappingIterator<Map<String, String>> it = csvMapper.readerFor(Map.class)
                     .with(schema)
                     .readValues(new File(csvFilePath));
 
-            // Create the ArrayNode to hold all rows for XML conversion
-            ArrayNode arrayNode = jsonMapper.createArrayNode();
-
-            // Read and track the row index (1-based) and transform based on selectedKey
-            int currentIndex = 1;  // Starting from 1 to match the selectedKey index
+            ObjectNode rootNode = jsonMapper.createObjectNode();
+            ArrayNode recordsArray = jsonMapper.createArrayNode();
 
             while (it.hasNext()) {
                 Map<String, String> row = it.next();
-                if (row.isEmpty()) continue;  // Skip empty rows
+                if (row.isEmpty()) continue;
 
-                // Check if we should process this row based on selectedKey
-                if (selectedKey == null || Integer.parseInt(selectedKey) == currentIndex) {
-                    ObjectNode objectNode = jsonMapper.createObjectNode();
+                ObjectNode recordNode = jsonMapper.createObjectNode();
+
+                if (selectedKey == null) {
+                    // Replace spaces & special chars
                     row.forEach((key, value) -> {
-                        String sanitizedKey = key.replaceAll("[^a-zA-Z0-9]", "_"); // Sanitize keys
-                        objectNode.put(sanitizedKey, value);
+                        String sanitizedKey = key.replaceAll("[^a-zA-Z0-9]", "_");
+                        recordNode.put(sanitizedKey, value);
                     });
-                    arrayNode.add(objectNode);
+                } else if (row.containsKey(selectedKey)) {
+                    // Process only the selected key
+                    String sanitizedKey = selectedKey.replaceAll("[^a-zA-Z0-9]", "_");
+                    recordNode.put(sanitizedKey, row.get(selectedKey));
                 }
 
-                currentIndex++; // Increment index for next row
+                recordsArray.add(recordNode);
             }
 
-            if (arrayNode.size() == 0) {
-                throw new IOException("No data found matching the criteria.");
-            }
+            rootNode.set("record", recordsArray);
 
-            // Root node for XML
-            ObjectNode rootNode = jsonMapper.createObjectNode();
-            rootNode.set("root", arrayNode);
-
-            // Convert to XML
             xmlMapper.writeValue(new File(xmlFilePath), rootNode);
 
             System.out.println("CSV successfully converted to XML and saved as: " + xmlFilePath);
@@ -217,7 +211,4 @@ class CsvFile extends CodeVertFile {
         }
         return xmlFilePath;
     }
-
-
-
 }

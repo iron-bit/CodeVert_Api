@@ -1,3 +1,12 @@
+OutputFiles/
+!**/FileTypes.json
+!pom.xml
+**.csv
+**.json
+**.xml
+**.txt
+
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

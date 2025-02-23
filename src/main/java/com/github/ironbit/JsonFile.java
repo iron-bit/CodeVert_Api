@@ -120,10 +120,9 @@ class JsonFile extends CodeVertFile {
                 return "";
             }
 
-            // Wrap root-level arrays to avoid QName issues
             if (targetNode.isArray()) {
                 ObjectNode wrapper = jsonMapper.createObjectNode();
-                wrapper.set("root", targetNode);
+                wrapper.set("record", targetNode);
                 targetNode = wrapper;
             }
 
@@ -172,7 +171,6 @@ class JsonFile extends CodeVertFile {
         }
         return node;
     }
-
 
 
     private String transformToJson() {
