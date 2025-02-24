@@ -59,7 +59,12 @@ class JsonFile extends CodeVertFile {
             JsonNode targetNode = extractTargetNode(selectedKey, rootNode);
 
             StringBuilder txtContent = new StringBuilder();
-            convertJsonNodeToTxt(targetNode, txtContent, "");
+            if (targetNode.isValueNode()){
+                txtContent.append(targetNode.asText()).append("\n");
+            }
+            else {
+                convertJsonNodeToTxt(targetNode, txtContent, "");
+            }
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(txtFilePath))) {
                 writer.write(txtContent.toString());

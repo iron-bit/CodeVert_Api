@@ -9,11 +9,11 @@ import java.io.File;
 public class Main {
     public static void main(String[] args) {
         //Creamos el objeto al ejecutar el evento de Drag and Drop
-        File userFile = new File("/home/tymur/Documents/CodeVertApi/src/main/resources/smth.json");
+        File userFile = new File("/home/tymur/Documents/CodeVertApi/src/main/resources/smth.xml");
         FileConverter fileConverter = new FileConverter();
         CodeVertFile file = fileConverter.prepareFile(userFile);
         file.getKeys().forEach(System.out::println);
-        String result = fileConverter.convert(file, FileExtension.JSON, "technologies");
+        String result = fileConverter.convert(file, FileExtension.TXT, "name");
         System.out.println(result);
     }
 }
